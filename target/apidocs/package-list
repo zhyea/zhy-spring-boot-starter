@@ -1,0 +1,5 @@
+com.jiduauto.crm.spring
+com.jiduauto.crm.spring.log
+com.jiduauto.crm.spring.trace
+com.jiduauto.crm.spring.trace.interceptor
+com.jiduauto.crm.spring.utils

@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.jiduauto.crm.spring.trace.TraceClewAutoConfiguration,\
+com.jiduauto.crm.spring.log.QuickLogAutoConfiguration
