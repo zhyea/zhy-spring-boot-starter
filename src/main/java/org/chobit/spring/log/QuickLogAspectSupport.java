@@ -1,7 +1,7 @@
 package org.chobit.spring.log;
 
+import org.chobit.commons.utils.JsonKit;
 import org.chobit.spring.OperationInvoker;
-import org.chobit.spring.utils.JsonKit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.AopProxyUtils;
