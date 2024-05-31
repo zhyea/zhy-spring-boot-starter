@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * TraceClew Interceptor
  *
- * @author rui.zhang
+ * @author robin
  */
 public class QuickLogInterceptor extends QuickLogAspectSupport implements MethodInterceptor, Serializable {
 

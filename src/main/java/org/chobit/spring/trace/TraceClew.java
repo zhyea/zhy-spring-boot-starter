@@ -7,7 +7,7 @@ import java.lang.annotation.*;
  * <p>
  * 用于填充traceId
  *
- * @author rui.zhang
+ * @author robin
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

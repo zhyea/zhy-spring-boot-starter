@@ -5,7 +5,7 @@ import java.lang.annotation.*;
 /**
  * 用于自动填充日志
  *
- * @author rui.zhang
+ * @author robin
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

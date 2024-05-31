@@ -17,7 +17,7 @@ import java.util.Map;
 /**
  * QuickLog切面相关支持类
  *
- * @author rui.zhang
+ * @author robin
  */
 public abstract class QuickLogAspectSupport {
 
