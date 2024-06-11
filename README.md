@@ -14,5 +14,5 @@
 
 # @TraceClew
 
-为一些后端发起的任务填充traceId，目的是解决因为没有traceId造成的无法跟踪日志的问题。
+通过在方法上添加`@TraceClew`为一些后端发起的方法填充traceId，以解决因为没有traceId造成的无法跟踪方法执行日志的问题。
 
