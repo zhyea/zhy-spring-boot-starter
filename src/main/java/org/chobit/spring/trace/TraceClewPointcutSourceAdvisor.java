@@ -1,6 +1,5 @@
-package org.chobit.spring.trace.interceptor;
+package org.chobit.spring.trace;
 
-import org.chobit.spring.trace.TraceClew;
 import org.springframework.aop.Pointcut;
 import org.springframework.aop.support.AbstractBeanFactoryPointcutAdvisor;
 import org.springframework.aop.support.StaticMethodMatcher;

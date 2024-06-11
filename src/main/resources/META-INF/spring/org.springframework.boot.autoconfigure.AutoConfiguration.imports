@@ -1,0 +1,2 @@
+org.chobit.spring.trace.TraceClewAutoConfiguration
+org.chobit.spring.log.QuickLogAutoConfiguration
