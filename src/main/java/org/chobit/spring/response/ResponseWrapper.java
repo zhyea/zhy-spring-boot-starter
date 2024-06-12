@@ -5,7 +5,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.lang.annotation.*;
 
+
 /**
+ * 接口返回值包装注解
+ *
  * @author robin
  */
 @Retention(RetentionPolicy.RUNTIME)
@@ -13,7 +16,6 @@ import java.lang.annotation.*;
 @Documented
 @ResponseBody
 public @interface ResponseWrapper {
-
 
 
 }

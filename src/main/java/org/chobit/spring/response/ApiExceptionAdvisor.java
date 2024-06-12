@@ -3,7 +3,9 @@ package org.chobit.spring.response;
 
 import org.chobit.commons.enums.CommonStatusCode;
 import org.chobit.commons.model.response.Result;
-import org.chobit.mocko.server.except.MockoServerException;
+import org.chobit.spring.response.exception.RwServerException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -19,6 +21,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class ApiExceptionAdvisor {
 
 
+    private static final Logger logger = LoggerFactory.getLogger(ApiExceptionAdvisor.class);
+
+
     /**
      * Api异常返回值处理
      *
@@ -26,14 +31,14 @@ public class ApiExceptionAdvisor {
      * @return 封装后的异常返回值
      */
     @ResponseBody
-    @ExceptionHandler(value = MockoServerException.class)
+    @ExceptionHandler(value = RwServerException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public Object mockoExceptionHandler(MockoServerException e) {
+    public Object mockoExceptionHandler(RwServerException e) {
 
         Result<?> r = new Result<>(e.getCode());
         r.setMsg(e.getMessage());
 
-        logger.warn("发现Mocko异常：{}", r.getMsg(), e);
+        logger.warn("发现服务端异常：{}", r.getMsg(), e);
 
         return r;
     }
