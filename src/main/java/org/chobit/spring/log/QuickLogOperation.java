@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * 日志相关字段
  *
- * @author rui.zhang
+ * @author robin
  */
 public class QuickLogOperation {
 

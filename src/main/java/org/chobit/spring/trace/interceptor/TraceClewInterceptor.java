@@ -2,6 +2,7 @@ package org.chobit.spring.trace.interceptor;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.chobit.commons.utils.StrKit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -10,11 +11,13 @@ import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.UUID;
 
+import static org.chobit.commons.utils.StrKit.isBlank;
+
 
 /**
  * TraceClew Interceptor
  *
- * @author rui.zhang
+ * @author robin
  */
 public class TraceClewInterceptor implements MethodInterceptor, Serializable {
 
@@ -34,22 +37,27 @@ public class TraceClewInterceptor implements MethodInterceptor, Serializable {
         Method method = invocation.getMethod();
         String clazz = method.getDeclaringClass().getName();
 
+        boolean needFillTraceId = false;
+
         try {
-            MDC.put(TRACE_ID, traceId());
-            logger.info("===TraceClew=== Add traceId to method {}#{}", clazz, method.getName());
+            if (isBlank(MDC.get(TRACE_ID))) {
+                needFillTraceId = true;
+                MDC.put(TRACE_ID, traceId());
+                logger.info("===TraceClew=== Add traceId to method {}#{}", clazz, method.getName());
+            }
 
             return invocation.proceed();
         } finally {
-            MDC.remove(TRACE_ID);
-            logger.info("===TraceClew=== Statistic {}#{}, method cost:{} ms", clazz, method.getName(), System.currentTimeMillis() - start);
+            if (needFillTraceId) {
+                MDC.remove(TRACE_ID);
+                logger.info("===TraceClew=== Statistic {}#{}, method cost:{} ms", clazz, method.getName(), System.currentTimeMillis() - start);
+            }
         }
-
-
     }
 
 
     private String traceId() {
-        return UUID.randomUUID().toString().replaceAll("-", "");
+        return StrKit.uuid();
     }
 
 }

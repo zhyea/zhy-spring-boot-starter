@@ -11,7 +11,7 @@ import java.lang.reflect.Method;
 
 
 /**
- * @author rui.zhang
+ * @author robin
  */
 public class QuickLogPointcutSourceAdvisor extends AbstractBeanFactoryPointcutAdvisor {
 

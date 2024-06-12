@@ -4,7 +4,7 @@ package org.chobit.spring;
 /**
  * 方法触发函数接口
  *
- * @author rui.zhang
+ * @author robin
  */
 @FunctionalInterface
 public interface OperationInvoker {
