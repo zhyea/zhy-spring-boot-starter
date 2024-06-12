@@ -13,6 +13,7 @@ import java.lang.annotation.*;
 @Inherited
 public @interface QuickLog {
 
+
     /**
      * 业务描述
      *

@@ -1,8 +1,6 @@
 package org.chobit.spring.trace;
 
 
-import org.chobit.spring.trace.interceptor.TraceClewInterceptor;
-import org.chobit.spring.trace.interceptor.TraceClewPointcutSourceAdvisor;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
