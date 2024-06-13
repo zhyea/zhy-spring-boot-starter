@@ -1,4 +1,4 @@
-package org.chobit.spring.response;
+package org.chobit.spring.rw;
 
 
 import org.springframework.web.bind.annotation.ResponseBody;

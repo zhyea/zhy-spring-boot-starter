@@ -10,7 +10,8 @@ import org.springframework.core.Ordered;
 /**
  * @author robin
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
+@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 public class QuickLogAutoConfiguration {
 
 

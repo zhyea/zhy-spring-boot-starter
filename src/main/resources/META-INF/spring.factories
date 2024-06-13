@@ -1,3 +1,4 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 org.chobit.spring.trace.TraceClewAutoConfiguration,\
-org.chobit.spring.log.QuickLogAutoConfiguration
+org.chobit.spring.log.QuickLogAutoConfiguration,\
+org.chobit.spring.rw.RwAutoConfiguration

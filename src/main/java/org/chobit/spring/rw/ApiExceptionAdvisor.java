@@ -1,9 +1,9 @@
-package org.chobit.spring.response;
+package org.chobit.spring.rw;
 
 
 import org.chobit.commons.enums.CommonStatusCode;
 import org.chobit.commons.model.response.Result;
-import org.chobit.spring.response.exception.RwServerException;
+import org.chobit.spring.rw.exception.RwServerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;

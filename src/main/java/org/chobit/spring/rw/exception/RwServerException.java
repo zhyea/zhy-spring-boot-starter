@@ -1,4 +1,4 @@
-package org.chobit.spring.response.exception;
+package org.chobit.spring.rw.exception;
 
 /**
  * 服务异常包装类
