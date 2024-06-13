@@ -10,15 +10,61 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "rw")
 public class RwProperties {
 
-    
-    private boolean enabled;
+
+	/**
+	 * 是否启用
+	 */
+	private boolean enable = true;
 
 
-    public boolean isEnabled() {
-        return enabled;
-    }
+	/**
+	 * 接口默认成功code
+	 */
+	private int successCode = 0;
 
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
+
+	/**
+	 * 接口默认失败code
+	 */
+	private int failCode = 10000;
+
+
+	/**
+	 * 是否处理异常
+	 */
+	private boolean wrapExcept = true;
+
+
+	public boolean isEnable() {
+		return enable;
+	}
+
+	public void setEnable(boolean enable) {
+		this.enable = enable;
+	}
+
+
+	public int getSuccessCode() {
+		return successCode;
+	}
+
+	public void setSuccessCode(int successCode) {
+		this.successCode = successCode;
+	}
+
+	public int getFailCode() {
+		return failCode;
+	}
+
+	public void setFailCode(int failCode) {
+		this.failCode = failCode;
+	}
+
+	public boolean isWrapExcept() {
+		return wrapExcept;
+	}
+
+	public void setWrapExcept(boolean wrapExcept) {
+		this.wrapExcept = wrapExcept;
+	}
 }
