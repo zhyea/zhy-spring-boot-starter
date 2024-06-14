@@ -5,7 +5,7 @@ package org.chobit.spring.rw.exception;
  *
  * @author robin
  */
-public class RwServerException extends RuntimeException {
+public class RwException extends RuntimeException {
 
 
     private static final long serialVersionUID = 7773203247174587636L;
@@ -13,12 +13,12 @@ public class RwServerException extends RuntimeException {
 
     private final int code;
 
-    public RwServerException(int code, String msg) {
+    public RwException(int code, String msg) {
         super(msg);
         this.code = code;
     }
 
-    public RwServerException(int code, String msg, Throwable t) {
+    public RwException(int code, String msg, Throwable t) {
         super(msg, t);
         this.code = code;
     }

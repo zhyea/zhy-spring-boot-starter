@@ -2,7 +2,7 @@ package org.chobit.spring.rw;
 
 
 import org.chobit.commons.model.response.Result;
-import org.chobit.spring.rw.exception.RwServerException;
+import org.chobit.spring.rw.exception.RwException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,8 +46,8 @@ public class ApiExceptionAdvisor {
      * @return 封装后的异常返回值
      */
     @ResponseBody
-    @ExceptionHandler(RwServerException.class)
-    public Object rwExceptionHandler(RwServerException e) {
+    @ExceptionHandler(RwException.class)
+    public Object rwExceptionHandler(RwException e) {
 
         Result<?> r = new Result<>(e.getCode());
         r.setMsg(e.getMessage());
