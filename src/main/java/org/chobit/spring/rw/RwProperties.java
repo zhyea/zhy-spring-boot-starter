@@ -11,60 +11,60 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class RwProperties {
 
 
-	/**
-	 * 是否启用
-	 */
-	private boolean enable = true;
+    /**
+     * 是否启用
+     */
+    private boolean enable = true;
 
 
-	/**
-	 * 接口默认成功code
-	 */
-	private int successCode = 0;
+    /**
+     * 接口默认成功code
+     */
+    private int successCode = 0;
 
 
-	/**
-	 * 接口默认失败code
-	 */
-	private int failCode = 10000;
+    /**
+     * 接口默认失败code
+     */
+    private int failCode = 10000;
 
 
-	/**
-	 * 是否处理异常
-	 */
-	private boolean wrapExcept = true;
+    /**
+     * 是否包装异常
+     */
+    private boolean wrapExcept = true;
 
 
-	public boolean isEnable() {
-		return enable;
-	}
+    public boolean isEnable() {
+        return enable;
+    }
 
-	public void setEnable(boolean enable) {
-		this.enable = enable;
-	}
+    public void setEnable(boolean enable) {
+        this.enable = enable;
+    }
 
 
-	public int getSuccessCode() {
-		return successCode;
-	}
+    public int getSuccessCode() {
+        return successCode;
+    }
 
-	public void setSuccessCode(int successCode) {
-		this.successCode = successCode;
-	}
+    public void setSuccessCode(int successCode) {
+        this.successCode = successCode;
+    }
 
-	public int getFailCode() {
-		return failCode;
-	}
+    public int getFailCode() {
+        return failCode;
+    }
 
-	public void setFailCode(int failCode) {
-		this.failCode = failCode;
-	}
+    public void setFailCode(int failCode) {
+        this.failCode = failCode;
+    }
 
-	public boolean isWrapExcept() {
-		return wrapExcept;
-	}
+    public boolean isWrapExcept() {
+        return wrapExcept;
+    }
 
-	public void setWrapExcept(boolean wrapExcept) {
-		this.wrapExcept = wrapExcept;
-	}
+    public void setWrapExcept(boolean wrapExcept) {
+        this.wrapExcept = wrapExcept;
+    }
 }

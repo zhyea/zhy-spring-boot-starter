@@ -1,5 +1,7 @@
 package org.chobit.spring.trace;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 
 /**
@@ -10,8 +12,11 @@ import org.springframework.beans.factory.InitializingBean;
 public class TraceClewStarter implements InitializingBean {
 
 
+    private static final Logger logger = LoggerFactory.getLogger(TraceClewStarter.class);
+
+
     @Override
     public void afterPropertiesSet() throws Exception {
-        System.out.println("------------------->>>> TraceClew has been enabled!");
+        logger.debug("TraceClew has been enabled.");
     }
 }

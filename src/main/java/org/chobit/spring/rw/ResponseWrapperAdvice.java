@@ -2,6 +2,8 @@ package org.chobit.spring.rw;
 
 import org.chobit.commons.model.response.Result;
 import org.chobit.commons.utils.JsonKit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.AnnotatedElementUtils;
@@ -25,12 +27,14 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 @RestControllerAdvice
 public class ResponseWrapperAdvice implements ResponseBodyAdvice<Object> {
 
+	private static final Logger logger = LoggerFactory.getLogger(ResponseWrapperAdvice.class);
 
 	private final RwProperties rwProperties;
 
 	@Autowired
 	public ResponseWrapperAdvice(RwProperties rwProperties) {
 		this.rwProperties = rwProperties;
+		logger.debug("ApiResponseWrapper has been enabled.");
 	}
 
 	@Override

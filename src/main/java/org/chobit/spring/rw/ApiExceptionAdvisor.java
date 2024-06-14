@@ -6,12 +6,19 @@ import org.chobit.spring.rw.exception.RwServerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.stream.Collectors;
+
+import static org.chobit.commons.constans.Symbol.COMMA;
+import static org.chobit.commons.constans.Symbol.EMPTY;
 
 
 /**
@@ -21,88 +28,107 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class ApiExceptionAdvisor {
 
 
-	private static final Logger logger = LoggerFactory.getLogger(ApiExceptionAdvisor.class);
+    private static final Logger logger = LoggerFactory.getLogger(ApiExceptionAdvisor.class);
 
 
-	private final RwProperties rwProperties;
+    private final RwProperties rwProperties;
 
-	@Autowired
-	public ApiExceptionAdvisor(RwProperties rwProperties) {
-		this.rwProperties = rwProperties;
-	}
-
-	/**
-	 * Api异常返回值处理
-	 *
-	 * @param e 异常信息
-	 * @return 封装后的异常返回值
-	 */
-	@ResponseBody
-	@ExceptionHandler(value = RwServerException.class)
-	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-	public Object mockoExceptionHandler(RwServerException e) {
-
-		Result<?> r = new Result<>(e.getCode());
-		r.setMsg(e.getMessage());
-
-		logger.warn("发现服务端异常：{}", r.getMsg(), e);
-
-		return r;
-	}
+    @Autowired
+    public ApiExceptionAdvisor(RwProperties rwProperties) {
+        this.rwProperties = rwProperties;
+    }
 
 
-	/**
-	 * Api异常返回值处理
-	 *
-	 * @param ex 异常信息
-	 * @return 封装后的异常返回值
-	 */
-	@ResponseBody
-	@ExceptionHandler(value = MethodArgumentNotValidException.class)
-	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-	public Result<?> paramExceptionHandler(MethodArgumentNotValidException ex) {
+    /**
+     * 自定义业务异常返回值处理
+     *
+     * @param e 异常信息
+     * @return 封装后的异常返回值
+     */
+    @ResponseBody
+    @ExceptionHandler(RwServerException.class)
+    public Object rwExceptionHandler(RwServerException e) {
 
-		String msg = "";
-		StringBuilder logMsg = new StringBuilder();
-		if (ex.hasFieldErrors()) {
-			msg = (null == ex.getFieldError() ? "" : ex.getFieldError().getDefaultMessage());
-		} else if (ex.hasGlobalErrors()) {
-			msg = (null == ex.getGlobalError() ? "" : ex.getGlobalError().getDefaultMessage());
-		}
+        Result<?> r = new Result<>(e.getCode());
+        r.setMsg(e.getMessage());
 
-		ex.getAllErrors().forEach(e -> {
-			if (logMsg.length() > 0) {
-				logMsg.append(", ");
-			}
-			logMsg.append(e.getDefaultMessage());
-		});
+        logger.warn("发现服务端异常：{}", r.getMsg(), e);
 
-		Result<?> r = new Result<>(rwProperties.getFailCode());
-		r.setMsg(msg);
-
-		logger.warn("请求参数错误, total:{}, detail: {}", ex.getErrorCount(), logMsg);
-
-		return r;
-	}
+        return r;
+    }
 
 
-	/**
-	 * Api异常返回值处理
-	 *
-	 * @param e 异常信息
-	 * @return 封装后的异常返回值
-	 */
-	@ResponseBody
-	@ExceptionHandler(value = Exception.class)
-	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-	public Result<?> exceptionHandler(Exception e) {
+    /**
+     * 参数校验异常返回值处理
+     *
+     * @param ex 异常信息
+     * @return 封装后的异常返回值
+     */
+    @ResponseBody
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Result<?> paramExceptionHandler(MethodArgumentNotValidException ex) {
 
-		Result<?> r = new Result<>(rwProperties.getFailCode());
-		r.setMsg("未知异常");
+        String msg = EMPTY;
+        if (ex.hasFieldErrors()) {
+            msg = (null == ex.getFieldError() ? EMPTY : ex.getFieldError().getDefaultMessage());
+        } else if (ex.hasGlobalErrors()) {
+            msg = (null == ex.getGlobalError() ? EMPTY : ex.getGlobalError().getDefaultMessage());
+        }
 
-		logger.warn("发现未知异常：{}", r.getMsg(), e);
+        String logMsg = ex.getAllErrors().stream()
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .collect(Collectors.joining(COMMA));
 
-		return r;
-	}
+        Result<?> r = new Result<>(rwProperties.getFailCode());
+        r.setMsg(msg);
+
+        logger.warn("请求参数错误, total:{}, detail:{}", ex.getErrorCount(), logMsg);
+
+        return r;
+    }
+
+
+    /**
+     * 未知BindException处理
+     *
+     * @param ex 异常信息
+     * @return 封装后的异常返回值
+     */
+    @ResponseBody
+    @ExceptionHandler(BindException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public Result<?> bindExceptionHandler(BindException ex) {
+
+        String msg = ex.getAllErrors().stream()
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .collect(Collectors.joining(COMMA));
+
+        Result<?> r = new Result<>(rwProperties.getFailCode());
+        r.setMsg("未知异常");
+
+        logger.error("发现未知异常: {}", msg, ex);
+
+        return r;
+    }
+
+
+    /**
+     * 未知异常返回值处理
+     *
+     * @param e 异常信息
+     * @return 封装后的异常返回值
+     */
+    @ResponseBody
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public Result<?> exceptionHandler(Exception e) {
+
+        Result<?> r = new Result<>(rwProperties.getFailCode());
+        r.setMsg("未知异常");
+
+        logger.error("发现未知异常: {}", r.getMsg(), e);
+
+        return r;
+    }
 
 }
