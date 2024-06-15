@@ -1,0 +1,38 @@
+{
+	"hints": [],
+	"groups": [
+		{
+			"sourceType": "org.chobit.spring.rw.RwProperties",
+			"name": "rw",
+			"type": "org.chobit.spring.rw.RwProperties"
+		}
+	],
+	"properties": [
+		{
+			"sourceType": "org.chobit.spring.rw.RwProperties",
+			"name": "rw.enable",
+			"description": "Enable Response Wrapper",
+			"type": "java.lang.Boolean",
+			"defaultValue": "true"
+		},
+		{
+			"sourceType": "org.chobit.spring.rw.RwProperties",
+			"name": "rw.successCode",
+			"description": "Success code for response",
+			"type": "java.lang.Integer"
+		},
+		{
+			"sourceType": "org.chobit.spring.rw.RwProperties",
+			"name": "rw.failCode",
+			"description": "Fail code for response",
+			"type": "java.lang.Integer"
+		},
+		{
+			"sourceType": "org.chobit.spring.rw.RwProperties",
+			"name": "rw.wrapExcept",
+			"description": "Whether wrap exception",
+			"type": "java.lang.Boolean",
+			"defaultValue": "true"
+		}
+	]
+}
