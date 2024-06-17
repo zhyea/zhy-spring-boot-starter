@@ -11,60 +11,76 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class RwProperties {
 
 
-    /**
-     * 是否启用
-     */
-    private boolean enable = true;
+	/**
+	 * 是否启用
+	 */
+	private boolean enable = true;
 
 
-    /**
-     * 接口默认成功code
-     */
-    private int successCode = 0;
+	/**
+	 * 接口默认成功code
+	 */
+	private int successCode = 0;
 
 
-    /**
-     * 接口默认失败code
-     */
-    private int failCode = 10000;
+	/**
+	 * 接口默认失败code
+	 */
+	private int failCode = 10000;
 
 
-    /**
-     * 是否包装异常
-     */
-    private boolean wrapExcept = true;
+	/**
+	 * 是否开启静默模式
+	 * true 不需要wrapper注解
+	 * false  需要注解
+	 */
+	private boolean silentMode = false;
 
 
-    public boolean isEnable() {
-        return enable;
-    }
-
-    public void setEnable(boolean enable) {
-        this.enable = enable;
-    }
+	/**
+	 * 是否包装异常
+	 */
+	private boolean wrapExcept = true;
 
 
-    public int getSuccessCode() {
-        return successCode;
-    }
+	public boolean isEnable() {
+		return enable;
+	}
 
-    public void setSuccessCode(int successCode) {
-        this.successCode = successCode;
-    }
+	public void setEnable(boolean enable) {
+		this.enable = enable;
+	}
 
-    public int getFailCode() {
-        return failCode;
-    }
 
-    public void setFailCode(int failCode) {
-        this.failCode = failCode;
-    }
+	public int getSuccessCode() {
+		return successCode;
+	}
 
-    public boolean isWrapExcept() {
-        return wrapExcept;
-    }
+	public void setSuccessCode(int successCode) {
+		this.successCode = successCode;
+	}
 
-    public void setWrapExcept(boolean wrapExcept) {
-        this.wrapExcept = wrapExcept;
-    }
+	public int getFailCode() {
+		return failCode;
+	}
+
+	public void setFailCode(int failCode) {
+		this.failCode = failCode;
+	}
+
+	public boolean isSilentMode() {
+		return silentMode;
+	}
+
+	public void setSilentMode(boolean silentMode) {
+		this.silentMode = silentMode;
+	}
+
+	public boolean isWrapExcept() {
+		return wrapExcept;
+	}
+
+	public void setWrapExcept(boolean wrapExcept) {
+		this.wrapExcept = wrapExcept;
+	}
 }

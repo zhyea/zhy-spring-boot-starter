@@ -33,6 +33,13 @@
 			"description": "Whether wrap exception",
 			"type": "java.lang.Boolean",
 			"defaultValue": "true"
+		},
+		{
+			"sourceType": "org.chobit.spring.rw.RwProperties",
+			"name": "rw.silentMode",
+			"description": "Whether enable silent mode",
+			"type": "java.lang.Boolean",
+			"defaultValue": "true"
 		}
 	]
 }
