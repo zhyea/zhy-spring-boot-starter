@@ -43,12 +43,12 @@ public class ResponseWrapperAdvice implements ResponseBodyAdvice<Object> {
 		boolean isApiController = AnnotatedElementUtils.hasAnnotation(returnType.getContainingClass(), RestController.class)
 				|| returnType.hasMethodAnnotation(ResponseBody.class);;
 
-		boolean existsResponseWrapper = AnnotatedElementUtils.hasAnnotation(returnType.getContainingClass(), ResponseWrapper.class)
+		boolean effectiveResponseWrapper = AnnotatedElementUtils.hasAnnotation(returnType.getContainingClass(), ResponseWrapper.class)
 				|| returnType.hasMethodAnnotation(ResponseWrapper.class);
 
-		existsResponseWrapper = !rwProperties.isSilentMode() && existsResponseWrapper;
+		effectiveResponseWrapper = rwProperties.isSilentMode() || effectiveResponseWrapper;
 
-		return isApiController && existsResponseWrapper;
+		return isApiController && effectiveResponseWrapper;
 	}
 
 
