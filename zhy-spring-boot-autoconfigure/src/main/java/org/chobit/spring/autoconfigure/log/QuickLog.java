@@ -1,4 +1,4 @@
-package org.chobit.spring.log;
+package org.chobit.spring.autoconfigure.log;
 
 import java.lang.annotation.*;
 

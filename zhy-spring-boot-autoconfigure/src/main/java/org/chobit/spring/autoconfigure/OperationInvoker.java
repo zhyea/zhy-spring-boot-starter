@@ -1,4 +1,4 @@
-package org.chobit.spring;
+package org.chobit.spring.autoconfigure;
 
 
 /**
