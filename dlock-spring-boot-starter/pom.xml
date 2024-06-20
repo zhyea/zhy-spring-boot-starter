@@ -9,7 +9,7 @@
         <version>0.0.1.1</version>
     </parent>
 
-    <artifactId>zlock-spring-boot-starter</artifactId>
+    <artifactId>dlock-spring-boot-starter</artifactId>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>

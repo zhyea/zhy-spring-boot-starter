@@ -1,4 +1,4 @@
-package org.chobit.spring.zlock.interceptor;
+package org.chobit.spring.dlock.interceptor;
 
 import org.chobit.spring.dlock.exception.DLockException;
 import org.chobit.spring.dlock.interceptor.spel.RLockOperationExpressionEvaluator;
@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 import static jodd.util.StringUtil.isBlank;
 
 /**
- * Base class for redLock aspects, such as the {@link RLockInterceptor} or an AspectJ aspect.
+ * Base class for redLock aspects, such as the {@link DLockInterceptor} or an AspectJ aspect.
  * This enables the underlying Spring caching infrastructure to be used easily to implement an aspect for any aspect system.
  * <p>
  * Subclasses are responsible for calling relevant methods in the correct order.
@@ -34,10 +34,10 @@ import static jodd.util.StringUtil.isBlank;
  *
  * @author rui.zhang
  */
-class RLockAspectSupport implements BeanFactoryAware, InitializingBean {
+class DLockAspectSupport implements BeanFactoryAware, InitializingBean {
 
 
-    private static final Logger logger = LoggerFactory.getLogger(RLockAspectSupport.class);
+    private static final Logger logger = LoggerFactory.getLogger(DLockAspectSupport.class);
 
     private final Map<RedLockOperationKey, RedLockOperationMetadata> metadataCache = new ConcurrentHashMap<>(1024);
 
@@ -49,7 +49,7 @@ class RLockAspectSupport implements BeanFactoryAware, InitializingBean {
 
     private RedissonClient redissonClient;
 
-    public RLockAspectSupport() {
+    public DLockAspectSupport() {
     }
 
     @Override

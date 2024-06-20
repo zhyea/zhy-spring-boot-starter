@@ -1,4 +1,4 @@
-package org.chobit.spring.zlock.interceptor.spel;
+package org.chobit.spring.dlock.interceptor.spel;
 
 import org.springframework.context.expression.MethodBasedEvaluationContext;
 import org.springframework.core.ParameterNameDiscoverer;

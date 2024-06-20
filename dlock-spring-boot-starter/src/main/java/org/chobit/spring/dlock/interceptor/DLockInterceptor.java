@@ -1,4 +1,4 @@
-package org.chobit.spring.zlock.interceptor;
+package org.chobit.spring.dlock.interceptor;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
@@ -13,7 +13,7 @@ import java.lang.reflect.Method;
  *
  * @author rui.zhang
  */
-public class RLockInterceptor extends RLockAspectSupport implements MethodInterceptor, Serializable {
+public class DLockInterceptor extends DLockAspectSupport implements MethodInterceptor, Serializable {
 
 
     @Override

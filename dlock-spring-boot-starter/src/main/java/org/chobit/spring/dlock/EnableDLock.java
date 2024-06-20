@@ -1,4 +1,4 @@
-package org.chobit.spring.zlock;
+package org.chobit.spring.dlock;
 
 
 import org.springframework.boot.autoconfigure.AutoConfigurationPackage;
@@ -16,7 +16,7 @@ import java.lang.annotation.*;
 @Documented
 @Inherited
 @AutoConfigurationPackage
-@Import(RLockConfiguration.class)
+@Import(DLockConfiguration.class)
 public @interface EnableDLock {
 
 

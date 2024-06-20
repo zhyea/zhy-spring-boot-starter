@@ -1,4 +1,4 @@
-package org.chobit.spring.zlock.interceptor;
+package org.chobit.spring.dlock.interceptor;
 
 import org.springframework.aop.Pointcut;
 import org.springframework.aop.support.AbstractBeanFactoryPointcutAdvisor;

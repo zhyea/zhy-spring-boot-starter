@@ -1,4 +1,4 @@
-package org.chobit.spring.zlock.interceptor;
+package org.chobit.spring.dlock.interceptor;
 
 import org.springframework.lang.Nullable;
 
@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.lang.reflect.Method;
 
 /**
- * Interface used by {@link RLockInterceptor}.
+ * Interface used by {@link DLockInterceptor}.
  * Implementations know how to source RLock attributes,
  * whether from configuration, metadata attributes at source level, or elsewhere.
  *

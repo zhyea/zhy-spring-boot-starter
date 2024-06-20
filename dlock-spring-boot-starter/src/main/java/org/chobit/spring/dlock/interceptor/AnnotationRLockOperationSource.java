@@ -1,4 +1,4 @@
-package org.chobit.spring.zlock.interceptor;
+package org.chobit.spring.dlock.interceptor;
 
 import org.chobit.spring.dlock.DLock;
 import org.springframework.core.BridgeMethodResolver;

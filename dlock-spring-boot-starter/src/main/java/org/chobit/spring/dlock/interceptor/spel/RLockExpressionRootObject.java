@@ -1,4 +1,4 @@
-package org.chobit.spring.zlock.interceptor.spel;
+package org.chobit.spring.dlock.interceptor.spel;
 
 import java.lang.reflect.Method;
 

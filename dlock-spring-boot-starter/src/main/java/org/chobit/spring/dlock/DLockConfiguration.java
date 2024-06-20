@@ -1,4 +1,4 @@
-package org.chobit.spring.zlock;
+package org.chobit.spring.dlock;
 
 import org.chobit.spring.dlock.interceptor.AnnotationRLockOperationSource;
 import org.chobit.spring.dlock.interceptor.BeanFactoryRLockOperationSourceAdvisor;
@@ -26,7 +26,7 @@ import static jodd.util.StringUtil.isNotBlank;
 @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 @ConditionalOnClass({Redisson.class, RedissonClient.class, RedisProperties.class})
 @EnableConfigurationProperties(RedisProperties.class)
-public class RLockConfiguration {
+public class DLockConfiguration {
 
 
     @Bean
