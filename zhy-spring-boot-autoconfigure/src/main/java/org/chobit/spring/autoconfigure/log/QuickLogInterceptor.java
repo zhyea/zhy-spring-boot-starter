@@ -1,6 +1,6 @@
-package org.chobit.spring.log;
+package org.chobit.spring.autoconfigure.log;
 
-import org.chobit.spring.OperationInvoker;
+import org.chobit.spring.common.OperationInvoker;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 

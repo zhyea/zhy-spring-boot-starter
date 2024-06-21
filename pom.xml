@@ -19,6 +19,7 @@
     <modules>
         <module>dlock-spring-boot-starter</module>
         <module>zhy-spring-boot-autoconfigure</module>
+        <module>zhy-spring-common</module>
     </modules>
 
     <properties>
@@ -37,6 +38,11 @@
                 <version>${spring.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.chobit.spring</groupId>
+                <artifactId>zhy-spring-common</artifactId>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.chobit.commons</groupId>

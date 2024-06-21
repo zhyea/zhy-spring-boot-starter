@@ -1,4 +1,4 @@
-package org.chobit.spring.rw;
+package org.chobit.spring.autoconfigure.rw;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;

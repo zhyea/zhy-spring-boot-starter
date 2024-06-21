@@ -29,6 +29,10 @@
             <optional>true</optional>
         </dependency>
         <dependency>
+            <groupId>org.chobit.spring</groupId>
+            <artifactId>zhy-spring-common</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.chobit.commons</groupId>
             <artifactId>common-utils</artifactId>
         </dependency>

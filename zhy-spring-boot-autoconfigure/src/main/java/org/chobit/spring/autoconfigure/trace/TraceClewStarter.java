@@ -1,4 +1,4 @@
-package org.chobit.spring.trace;
+package org.chobit.spring.autoconfigure.trace;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

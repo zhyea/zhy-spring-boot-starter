@@ -1,4 +1,4 @@
-package org.chobit.spring.rw;
+package org.chobit.spring.autoconfigure.rw;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

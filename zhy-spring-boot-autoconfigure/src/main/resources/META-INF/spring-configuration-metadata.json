@@ -2,7 +2,7 @@
 	"hints": [],
 	"groups": [
 		{
-			"sourceType": "org.chobit.spring.rw.RwProperties",
+			"sourceType": "org.chobit.spring.autoconfigure.rw.RwProperties",
 			"name": "rw",
 			"type": "org.chobit.spring.rw.RwProperties"
 		}

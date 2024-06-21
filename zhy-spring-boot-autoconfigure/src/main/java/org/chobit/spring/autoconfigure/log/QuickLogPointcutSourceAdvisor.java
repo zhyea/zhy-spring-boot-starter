@@ -1,4 +1,4 @@
-package org.chobit.spring.log;
+package org.chobit.spring.autoconfigure.log;
 
 import org.springframework.aop.Pointcut;
 import org.springframework.aop.support.AbstractBeanFactoryPointcutAdvisor;

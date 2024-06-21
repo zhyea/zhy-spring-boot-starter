@@ -1,4 +1,4 @@
-package org.chobit.spring.trace;
+package org.chobit.spring.autoconfigure.trace;
 
 import org.springframework.aop.Pointcut;
 import org.springframework.aop.support.AbstractBeanFactoryPointcutAdvisor;
