@@ -1,9 +1,6 @@
 package org.chobit.spring.dlock;
 
-import org.chobit.spring.dlock.interceptor.AnnotationRLockOperationSource;
-import org.chobit.spring.dlock.interceptor.BeanFactoryRLockOperationSourceAdvisor;
-import org.chobit.spring.dlock.interceptor.RLockInterceptor;
-import org.chobit.spring.dlock.interceptor.RLockOperationSource;
+import org.chobit.spring.dlock.interceptor.*;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.ClusterServersConfig;
@@ -18,7 +15,8 @@ import org.springframework.context.annotation.Role;
 
 import java.util.List;
 
-import static jodd.util.StringUtil.isNotBlank;
+import static org.chobit.commons.utils.StrKit.isNotBlank;
+
 
 /**
  * @author rui.zhang
@@ -88,8 +86,8 @@ public class DLockConfiguration {
 
     @Bean
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-    public RLockInterceptor redLockInterceptor(RLockOperationSource redLockOperationSource, RedissonClient redissonClient) {
-        RLockInterceptor interceptor = new RLockInterceptor();
+    public DLockInterceptor redLockInterceptor(RLockOperationSource redLockOperationSource, RedissonClient redissonClient) {
+        DLockInterceptor interceptor = new DLockInterceptor();
         interceptor.setRedLockOperationSource(redLockOperationSource);
         interceptor.setRedissonClient(redissonClient);
         return interceptor;
@@ -98,7 +96,7 @@ public class DLockConfiguration {
 
     @Bean
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-    public BeanFactoryRLockOperationSourceAdvisor redLockAdvisor(RLockInterceptor redLockInterceptor,
+    public BeanFactoryRLockOperationSourceAdvisor redLockAdvisor(DLockInterceptor redLockInterceptor,
                                                                  RLockOperationSource redLockOperationSource) {
         BeanFactoryRLockOperationSourceAdvisor advisor = new BeanFactoryRLockOperationSourceAdvisor();
         advisor.setRedLockOperationSource(redLockOperationSource);
