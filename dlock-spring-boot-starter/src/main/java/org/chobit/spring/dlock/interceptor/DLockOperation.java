@@ -3,11 +3,11 @@ package org.chobit.spring.dlock.interceptor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Base class for redLock operations
+ * Base class for DLOck operation
  *
- * @author rui.zhang
+ * @author robin
  */
-public class RLockOperation {
+public class DLockOperation {
 
 
     /**

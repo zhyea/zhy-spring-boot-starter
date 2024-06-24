@@ -19,7 +19,7 @@ import static org.chobit.commons.utils.StrKit.isNotBlank;
 
 
 /**
- * @author rui.zhang
+ * @author robin
  */
 @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 @ConditionalOnClass({Redisson.class, RedissonClient.class, RedisProperties.class})
@@ -79,16 +79,16 @@ public class DLockConfiguration {
 
     @Bean
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-    public RLockOperationSource redLockOperationSource() {
-        return new AnnotationRLockOperationSource();
+    public DLockOperationSource redLockOperationSource() {
+        return new AnnotationDLockOperationSource();
     }
 
 
     @Bean
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-    public DLockInterceptor redLockInterceptor(RLockOperationSource redLockOperationSource, RedissonClient redissonClient) {
+    public DLockInterceptor redLockInterceptor(DLockOperationSource redLockOperationSource, RedissonClient redissonClient) {
         DLockInterceptor interceptor = new DLockInterceptor();
-        interceptor.setRedLockOperationSource(redLockOperationSource);
+        interceptor.setLockOperationSource(redLockOperationSource);
         interceptor.setRedissonClient(redissonClient);
         return interceptor;
     }
@@ -97,9 +97,9 @@ public class DLockConfiguration {
     @Bean
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
     public BeanFactoryRLockOperationSourceAdvisor redLockAdvisor(DLockInterceptor redLockInterceptor,
-                                                                 RLockOperationSource redLockOperationSource) {
+                                                                 DLockOperationSource redLockOperationSource) {
         BeanFactoryRLockOperationSourceAdvisor advisor = new BeanFactoryRLockOperationSourceAdvisor();
-        advisor.setRedLockOperationSource(redLockOperationSource);
+        advisor.setLockOperationSource(redLockOperationSource);
         advisor.setAdvice(redLockInterceptor);
         return advisor;
     }

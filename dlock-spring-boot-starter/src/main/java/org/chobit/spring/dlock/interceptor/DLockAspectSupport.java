@@ -1,7 +1,8 @@
 package org.chobit.spring.dlock.interceptor;
 
+import org.chobit.spring.common.OperationInvoker;
 import org.chobit.spring.dlock.exception.DLockException;
-import org.chobit.spring.dlock.interceptor.spel.RLockOperationExpressionEvaluator;
+import org.chobit.spring.dlock.interceptor.spel.DLockOperationExpressionEvaluator;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
@@ -30,9 +31,9 @@ import static jodd.util.StringUtil.isBlank;
  * <p>
  * Subclasses are responsible for calling relevant methods in the correct order.
  * <p>
- * Uses the Strategy design pattern. A {@link RLockOperationSource} is used for determining caching operations.
+ * Uses the Strategy design pattern. A {@link DLockOperationSource} is used for determining caching operations.
  *
- * @author rui.zhang
+ * @author robin
  */
 class DLockAspectSupport implements BeanFactoryAware, InitializingBean {
 
@@ -41,9 +42,9 @@ class DLockAspectSupport implements BeanFactoryAware, InitializingBean {
 
     private final Map<RedLockOperationKey, RedLockOperationMetadata> metadataCache = new ConcurrentHashMap<>(1024);
 
-    private final RLockOperationExpressionEvaluator evaluator = new RLockOperationExpressionEvaluator();
+    private final DLockOperationExpressionEvaluator evaluator = new DLockOperationExpressionEvaluator();
 
-    private RLockOperationSource redLockOperationSource;
+    private DLockOperationSource lockOperationSource;
 
     private BeanFactory beanFactory;
 
@@ -57,12 +58,12 @@ class DLockAspectSupport implements BeanFactoryAware, InitializingBean {
         this.beanFactory = beanFactory;
     }
 
-    public RLockOperationSource getRedLockOperationSource() {
-        return redLockOperationSource;
+    public DLockOperationSource getLockOperationSource() {
+        return lockOperationSource;
     }
 
-    public void setRedLockOperationSource(RLockOperationSource redLockOperationSource) {
-        this.redLockOperationSource = redLockOperationSource;
+    public void setLockOperationSource(DLockOperationSource lockOperationSource) {
+        this.lockOperationSource = lockOperationSource;
     }
 
     public void setRedissonClient(RedissonClient redissonClient) {
@@ -74,18 +75,18 @@ class DLockAspectSupport implements BeanFactoryAware, InitializingBean {
         if (null == this.beanFactory) {
             throw new IllegalStateException("Make sure to run within a BeanFactory containing a RedLockInterceptor bean!");
         }
-        if (null == getRedLockOperationSource()) {
+        if (null == getLockOperationSource()) {
             throw new IllegalStateException(
                     "'redLockAttributeSource' is required: If there are no 'redLockAttributeSource', then don't use a redLock aspect.");
         }
     }
 
 
-    protected Object execute(final RLockOperationInvoker invoker, Object target, Method method, Object[] args) throws Throwable {
+    protected Object execute(final OperationInvoker invoker, Object target, Method method, Object[] args) throws Throwable {
         Class<?> targetClass = getTargetClass(target);
-        RLockOperationSource operationSource = getRedLockOperationSource();
+        DLockOperationSource operationSource = getLockOperationSource();
         if (null != operationSource) {
-            RLockOperation operation = operationSource.getRedLockOperation(method, targetClass);
+            DLockOperation operation = operationSource.getLockOperation(method, targetClass);
             RedLockOperationContext context = createOperationContext(operation, method, args, target, targetClass);
             return this.execute(invoker, context);
         }
@@ -97,7 +98,7 @@ class DLockAspectSupport implements BeanFactoryAware, InitializingBean {
         return AopProxyUtils.ultimateTargetClass(target);
     }
 
-    private Object execute(final RLockOperationInvoker invoker, RedLockOperationContext context) throws Throwable {
+    private Object execute(final OperationInvoker invoker, RedLockOperationContext context) throws Throwable {
         String key = generateKey(context);
 
         logger.info("begin redisson lock with key: {}", key);
@@ -149,7 +150,7 @@ class DLockAspectSupport implements BeanFactoryAware, InitializingBean {
     }
 
 
-    protected RedLockOperationContext createOperationContext(RLockOperation operation,
+    protected RedLockOperationContext createOperationContext(DLockOperation operation,
                                                              Method method,
                                                              Object[] args,
                                                              Object target,
@@ -169,7 +170,7 @@ class DLockAspectSupport implements BeanFactoryAware, InitializingBean {
      * @param targetClass the target type
      * @return the resolved metadata for the operation
      */
-    protected RedLockOperationMetadata createRedLockOperationMetadata(RLockOperation operation,
+    protected RedLockOperationMetadata createRedLockOperationMetadata(DLockOperation operation,
                                                                       Method method,
                                                                       Class<?> targetClass) {
         RedLockOperationKey operationKey = new RedLockOperationKey(operation, method, targetClass);
@@ -184,11 +185,11 @@ class DLockAspectSupport implements BeanFactoryAware, InitializingBean {
 
     private static final class RedLockOperationKey implements Comparable<RedLockOperationKey> {
 
-        private final RLockOperation operation;
+        private final DLockOperation operation;
 
         private final AnnotatedElementKey methodKey;
 
-        private RedLockOperationKey(RLockOperation operation, Method method, Class<?> targetClass) {
+        private RedLockOperationKey(DLockOperation operation, Method method, Class<?> targetClass) {
             this.operation = operation;
             this.methodKey = new AnnotatedElementKey(method, targetClass);
         }
@@ -232,7 +233,7 @@ class DLockAspectSupport implements BeanFactoryAware, InitializingBean {
      */
     protected static class RedLockOperationMetadata {
 
-        private final RLockOperation operation;
+        private final DLockOperation operation;
 
         private final Method method;
 
@@ -242,7 +243,7 @@ class DLockAspectSupport implements BeanFactoryAware, InitializingBean {
 
         private final AnnotatedElementKey methodKey;
 
-        public RedLockOperationMetadata(RLockOperation operation,
+        public RedLockOperationMetadata(DLockOperation operation,
                                         Method method,
                                         Class<?> targetClass) {
             this.operation = operation;
@@ -255,7 +256,7 @@ class DLockAspectSupport implements BeanFactoryAware, InitializingBean {
 
 
     /**
-     * A context for a {@link RLockOperation}.
+     * A context for a {@link DLockOperation}.
      */
     protected class RedLockOperationContext {
 

@@ -12,7 +12,7 @@ package org.chobit.spring.dlock.interceptor;
  * @author robin
  */
 @FunctionalInterface
-public interface RLockOperationInvoker {
+public interface DLockOperationInvoker {
 
 
 

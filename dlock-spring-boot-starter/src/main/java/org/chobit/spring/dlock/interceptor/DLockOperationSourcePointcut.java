@@ -9,17 +9,17 @@ import java.io.Serializable;
 import java.lang.reflect.Method;
 
 /**
- * A Pointcut that matches if the underlying {@link RLockOperationSource} has an attribute for a given method.
+ * A Pointcut that matches if the underlying {@link DLockOperationSource} has an attribute for a given method.
  *
- * @author rui.zhang
+ * @author robin
  */
-public abstract class RLockOperationSourcePointcut extends StaticMethodMatcherPointcut implements Serializable {
+public abstract class DLockOperationSourcePointcut extends StaticMethodMatcherPointcut implements Serializable {
 
 
     @Override
     public boolean matches(@NonNull Method method, @NonNull Class<?> targetClass) {
-        RLockOperationSource ros = getRedLockOperationSource();
-        return (null != ros && null != ros.getRedLockOperation(method, targetClass));
+        DLockOperationSource ros = getRedLockOperationSource();
+        return (null != ros && null != ros.getLockOperation(method, targetClass));
     }
 
 
@@ -28,17 +28,17 @@ public abstract class RLockOperationSourcePointcut extends StaticMethodMatcherPo
         if (this == other) {
             return true;
         }
-        if (!(other instanceof RLockOperationSourcePointcut)) {
+        if (!(other instanceof DLockOperationSourcePointcut)) {
             return false;
         }
-        RLockOperationSourcePointcut otherPc = (RLockOperationSourcePointcut) other;
+        DLockOperationSourcePointcut otherPc = (DLockOperationSourcePointcut) other;
         return ObjectUtils.nullSafeEquals(this.getRedLockOperationSource(), otherPc.getRedLockOperationSource());
     }
 
 
     @Override
     public int hashCode() {
-        return RLockOperationSourcePointcut.class.hashCode();
+        return DLockOperationSourcePointcut.class.hashCode();
     }
 
     @Override
@@ -53,6 +53,6 @@ public abstract class RLockOperationSourcePointcut extends StaticMethodMatcherPo
      * @return RedLock Attribute 源
      */
     @Nullable
-    protected abstract RLockOperationSource getRedLockOperationSource();
+    protected abstract DLockOperationSource getRedLockOperationSource();
 
 }

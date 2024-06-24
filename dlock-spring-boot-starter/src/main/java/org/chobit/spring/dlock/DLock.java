@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * RedLock注解定义
  *
- * @author rui.zhang
+ * @author robin
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

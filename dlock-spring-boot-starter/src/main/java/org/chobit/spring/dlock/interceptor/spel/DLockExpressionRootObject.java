@@ -5,9 +5,9 @@ import java.lang.reflect.Method;
 /**
  * Class describing the root object used during the expression evaluation.
  *
- * @author rui.zhang
+ * @author robin
  */
-public class RLockExpressionRootObject {
+public class DLockExpressionRootObject {
 
 
     private final Method method;
@@ -19,7 +19,7 @@ public class RLockExpressionRootObject {
     private final Class<?> targetClass;
 
 
-    public RLockExpressionRootObject(Method method, Object[] args, Object target, Class<?> targetClass) {
+    public DLockExpressionRootObject(Method method, Object[] args, Object target, Class<?> targetClass) {
         this.method = method;
         this.target = target;
         this.targetClass = targetClass;

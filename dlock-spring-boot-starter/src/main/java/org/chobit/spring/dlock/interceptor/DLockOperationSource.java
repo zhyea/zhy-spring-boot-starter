@@ -10,9 +10,9 @@ import java.lang.reflect.Method;
  * Implementations know how to source RLock attributes,
  * whether from configuration, metadata attributes at source level, or elsewhere.
  *
- * @author rui.zhang
+ * @author robin
  */
-public interface RLockOperationSource extends Serializable {
+public interface DLockOperationSource extends Serializable {
 
 
     /**
@@ -23,6 +23,6 @@ public interface RLockOperationSource extends Serializable {
      * @return RedLock相关属性
      */
     @Nullable
-    RLockOperation getRedLockOperation(Method method, @Nullable Class<?> targetClass);
+    DLockOperation getLockOperation(Method method, @Nullable Class<?> targetClass);
 
 }

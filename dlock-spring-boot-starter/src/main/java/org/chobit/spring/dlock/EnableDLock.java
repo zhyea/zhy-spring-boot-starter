@@ -9,7 +9,7 @@ import java.lang.annotation.*;
 /**
  * kafka stater annotation
  *
- * @author rui.zhang
+ * @author robin
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

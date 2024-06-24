@@ -18,9 +18,9 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * <p>Performs internal caching for performance reasons using {@link AnnotatedElementKey}.
  *
- * @author rui.zhang
+ * @author robin
  */
-public class RLockOperationExpressionEvaluator extends CachedExpressionEvaluator {
+public class DLockOperationExpressionEvaluator extends CachedExpressionEvaluator {
 
 
     private final Map<ExpressionKey, Expression> keyCache = new ConcurrentHashMap<>(64);
@@ -44,13 +44,16 @@ public class RLockOperationExpressionEvaluator extends CachedExpressionEvaluator
                                                      Method targetMethod,
                                                      @Nullable BeanFactory beanFactory) {
 
-        RLockExpressionRootObject rootObject =
-                new RLockExpressionRootObject(method, args, target, targetClass);
-        RLockEvaluationContext evaluationContext =
-                new RLockEvaluationContext(rootObject, targetMethod, args, getParameterNameDiscoverer());
+        DLockExpressionRootObject rootObject =
+                new DLockExpressionRootObject(method, args, target, targetClass);
+
+        DLockEvaluationContext evaluationContext =
+                new DLockEvaluationContext(rootObject, targetMethod, args, getParameterNameDiscoverer());
+
         if (null != beanFactory) {
             evaluationContext.setBeanResolver(new BeanFactoryResolver(beanFactory));
         }
+
         return evaluationContext;
     }
 
