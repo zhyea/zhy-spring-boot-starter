@@ -10,11 +10,11 @@ import java.lang.reflect.Method;
 
 
 /**
- * RedLock Interceptor
+ * Lock Interceptor
  *
  * @author robin
  */
-public class DLockInterceptor extends DLockAspectSupport implements MethodInterceptor, Serializable {
+public class LockInterceptor extends LockAspectSupport implements MethodInterceptor, Serializable {
 
 
     @Override
@@ -24,7 +24,7 @@ public class DLockInterceptor extends DLockAspectSupport implements MethodInterc
             try {
                 return invocation.proceed();
             } catch (Throwable t) {
-                throw new DLockOperationInvoker.WrappedThrowableException(t);
+                throw new LockOperationInvoker.WrappedThrowableException(t);
             }
         };
 

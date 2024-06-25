@@ -7,7 +7,7 @@ import java.lang.reflect.Method;
  *
  * @author robin
  */
-public class DLockExpressionRootObject {
+public class LockExpressionRootObject {
 
 
     private final Method method;
@@ -19,7 +19,7 @@ public class DLockExpressionRootObject {
     private final Class<?> targetClass;
 
 
-    public DLockExpressionRootObject(Method method, Object[] args, Object target, Class<?> targetClass) {
+    public LockExpressionRootObject(Method method, Object[] args, Object target, Class<?> targetClass) {
         this.method = method;
         this.target = target;
         this.targetClass = targetClass;

@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author robin
  */
-public class DLockOperationExpressionEvaluator extends CachedExpressionEvaluator {
+public class LockOperationExpressionEvaluator extends CachedExpressionEvaluator {
 
 
     private final Map<ExpressionKey, Expression> keyCache = new ConcurrentHashMap<>(64);
@@ -44,11 +44,11 @@ public class DLockOperationExpressionEvaluator extends CachedExpressionEvaluator
                                                      Method targetMethod,
                                                      @Nullable BeanFactory beanFactory) {
 
-        DLockExpressionRootObject rootObject =
-                new DLockExpressionRootObject(method, args, target, targetClass);
+        LockExpressionRootObject rootObject =
+                new LockExpressionRootObject(method, args, target, targetClass);
 
-        DLockEvaluationContext evaluationContext =
-                new DLockEvaluationContext(rootObject, targetMethod, args, getParameterNameDiscoverer());
+        LockEvaluationContext evaluationContext =
+                new LockEvaluationContext(rootObject, targetMethod, args, getParameterNameDiscoverer());
 
         if (null != beanFactory) {
             evaluationContext.setBeanResolver(new BeanFactoryResolver(beanFactory));

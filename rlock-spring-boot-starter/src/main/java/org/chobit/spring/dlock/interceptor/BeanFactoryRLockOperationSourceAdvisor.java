@@ -12,18 +12,18 @@ import org.springframework.lang.Nullable;
 public class BeanFactoryRLockOperationSourceAdvisor extends AbstractBeanFactoryPointcutAdvisor {
 
 
-    private DLockOperationSource lockOperationSource;
+    private LockOperationSource lockOperationSource;
 
 
-    private final DLockOperationSourcePointcut pointcut = new DLockOperationSourcePointcut() {
+    private final LockOperationSourcePointcut pointcut = new LockOperationSourcePointcut() {
         @Override
-        protected DLockOperationSource getRedLockOperationSource() {
+        protected LockOperationSource getLockOperationSource() {
             return lockOperationSource;
         }
     };
 
 
-    public void setLockOperationSource(@Nullable DLockOperationSource lockOperationSource) {
+    public void setLockOperationSource(@Nullable LockOperationSource lockOperationSource) {
         this.lockOperationSource = lockOperationSource;
     }
 

@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Import;
 import java.lang.annotation.*;
 
 /**
- * kafka stater annotation
+ * distributed lock stater annotation
  *
  * @author robin
  */
@@ -16,8 +16,8 @@ import java.lang.annotation.*;
 @Documented
 @Inherited
 @AutoConfigurationPackage
-@Import(DLockConfiguration.class)
-public @interface EnableDLock {
+@Import(RLockConfiguration.class)
+public @interface EnableRLock {
 
 
 }

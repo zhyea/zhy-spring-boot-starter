@@ -6,14 +6,14 @@ package org.chobit.spring.dlock.exception;
  *
  * @author robin
  */
-public class DLockException extends RuntimeException {
+public class RLockException extends RuntimeException {
 
 
-	public DLockException() {
+	public RLockException() {
 	}
 
 
-	public DLockException(String message) {
+	public RLockException(String message) {
 		super(message);
 	}
 }

@@ -2,7 +2,7 @@ package org.chobit.spring.dlock.interceptor;
 
 
 /**
- * Abstract the invocation of a redLock operation.
+ * Abstract the invocation of a lock operation.
  *
  * <p>Does not provide a way to transmit checked exceptions but
  * provide a special exception that should be used to wrap any
@@ -12,8 +12,7 @@ package org.chobit.spring.dlock.interceptor;
  * @author robin
  */
 @FunctionalInterface
-public interface DLockOperationInvoker {
-
+public interface LockOperationInvoker {
 
 
     /**

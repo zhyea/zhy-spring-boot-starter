@@ -4,7 +4,7 @@ import java.lang.annotation.*;
 import java.util.concurrent.TimeUnit;
 
 /**
- * RedLock注解定义
+ * RLock注解定义
  *
  * @author robin
  */
@@ -12,13 +12,13 @@ import java.util.concurrent.TimeUnit;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-public @interface DLock {
+public @interface RLock {
 
 
     /**
-     * RedLock Key
+     * Key of lock
      *
-     * @return RedLock key
+     * @return key of lock
      */
     String key();
 

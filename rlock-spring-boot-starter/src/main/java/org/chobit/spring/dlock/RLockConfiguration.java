@@ -24,7 +24,7 @@ import static org.chobit.commons.utils.StrKit.isNotBlank;
 @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 @ConditionalOnClass({Redisson.class, RedissonClient.class, RedisProperties.class})
 @EnableConfigurationProperties(RedisProperties.class)
-public class DLockConfiguration {
+public class RLockConfiguration {
 
 
     @Bean
@@ -79,16 +79,16 @@ public class DLockConfiguration {
 
     @Bean
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-    public DLockOperationSource redLockOperationSource() {
-        return new AnnotationDLockOperationSource();
+    public LockOperationSource lockOperationSource() {
+        return new AnnotationLockOperationSource();
     }
 
 
     @Bean
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-    public DLockInterceptor redLockInterceptor(DLockOperationSource redLockOperationSource, RedissonClient redissonClient) {
-        DLockInterceptor interceptor = new DLockInterceptor();
-        interceptor.setLockOperationSource(redLockOperationSource);
+    public LockInterceptor lockInterceptor(LockOperationSource lockOperationSource, RedissonClient redissonClient) {
+        LockInterceptor interceptor = new LockInterceptor();
+        interceptor.setLockOperationSource(lockOperationSource);
         interceptor.setRedissonClient(redissonClient);
         return interceptor;
     }
@@ -96,11 +96,11 @@ public class DLockConfiguration {
 
     @Bean
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-    public BeanFactoryRLockOperationSourceAdvisor redLockAdvisor(DLockInterceptor redLockInterceptor,
-                                                                 DLockOperationSource redLockOperationSource) {
+    public BeanFactoryRLockOperationSourceAdvisor lockAdvisor(LockInterceptor lockInterceptor,
+                                                              LockOperationSource lockOperationSource) {
         BeanFactoryRLockOperationSourceAdvisor advisor = new BeanFactoryRLockOperationSourceAdvisor();
-        advisor.setLockOperationSource(redLockOperationSource);
-        advisor.setAdvice(redLockInterceptor);
+        advisor.setLockOperationSource(lockOperationSource);
+        advisor.setAdvice(lockInterceptor);
         return advisor;
     }
 

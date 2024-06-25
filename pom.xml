@@ -17,7 +17,7 @@
 
 
     <modules>
-        <module>dlock-spring-boot-starter</module>
+        <module>rlock-spring-boot-starter</module>
         <module>zhy-spring-boot-autoconfigure</module>
         <module>zhy-spring-common</module>
     </modules>
