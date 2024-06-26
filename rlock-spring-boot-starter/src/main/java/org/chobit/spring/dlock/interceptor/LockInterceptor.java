@@ -24,7 +24,7 @@ public class LockInterceptor extends LockAspectSupport implements MethodIntercep
             try {
                 return invocation.proceed();
             } catch (Throwable t) {
-                throw new LockOperationInvoker.WrappedThrowableException(t);
+                throw new OperationInvoker.WrappedThrowableException(t);
             }
         };
 
