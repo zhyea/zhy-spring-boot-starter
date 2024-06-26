@@ -1,4 +1,4 @@
-package org.chobit.spring.dlock.interceptor;
+package org.chobit.spring.rlock.interceptor;
 
 import java.util.concurrent.TimeUnit;
 

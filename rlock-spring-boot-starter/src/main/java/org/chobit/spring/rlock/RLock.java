@@ -1,4 +1,4 @@
-package org.chobit.spring.dlock;
+package org.chobit.spring.rlock;
 
 import java.lang.annotation.*;
 import java.util.concurrent.TimeUnit;
