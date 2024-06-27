@@ -1,6 +1,6 @@
-package org.chobit.spring.dlock.interceptor;
+package org.chobit.spring.rlock.interceptor;
 
-import org.chobit.spring.dlock.RLock;
+import org.chobit.spring.rlock.RLock;
 import org.springframework.core.BridgeMethodResolver;
 import org.springframework.core.MethodClassKey;
 import org.springframework.core.annotation.AnnotatedElementUtils;

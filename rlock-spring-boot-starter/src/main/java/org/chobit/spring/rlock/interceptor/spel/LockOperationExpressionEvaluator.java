@@ -1,4 +1,4 @@
-package org.chobit.spring.dlock.interceptor.spel;
+package org.chobit.spring.rlock.interceptor.spel;
 
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.expression.AnnotatedElementKey;

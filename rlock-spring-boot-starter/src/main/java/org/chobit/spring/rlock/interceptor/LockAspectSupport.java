@@ -1,8 +1,8 @@
-package org.chobit.spring.dlock.interceptor;
+package org.chobit.spring.rlock.interceptor;
 
 import org.chobit.spring.common.OperationInvoker;
-import org.chobit.spring.dlock.exception.RLockException;
-import org.chobit.spring.dlock.interceptor.spel.LockOperationExpressionEvaluator;
+import org.chobit.spring.rlock.exception.RLockException;
+import org.chobit.spring.rlock.interceptor.spel.LockOperationExpressionEvaluator;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;

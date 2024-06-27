@@ -1,6 +1,6 @@
-package org.chobit.spring.dlock;
+package org.chobit.spring.rlock;
 
-import org.chobit.spring.dlock.interceptor.*;
+import org.chobit.spring.rlock.interceptor.*;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.ClusterServersConfig;

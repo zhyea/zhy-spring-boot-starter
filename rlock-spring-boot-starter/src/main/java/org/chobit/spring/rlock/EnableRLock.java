@@ -1,4 +1,4 @@
-package org.chobit.spring.dlock;
+package org.chobit.spring.rlock;
 
 
 import org.springframework.boot.autoconfigure.AutoConfigurationPackage;

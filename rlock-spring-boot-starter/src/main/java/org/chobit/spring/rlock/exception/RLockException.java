@@ -1,4 +1,4 @@
-package org.chobit.spring.dlock.exception;
+package org.chobit.spring.rlock.exception;
 
 
 /**
