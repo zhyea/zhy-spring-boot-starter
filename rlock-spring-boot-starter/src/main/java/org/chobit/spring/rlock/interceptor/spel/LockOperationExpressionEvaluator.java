@@ -67,7 +67,7 @@ public class LockOperationExpressionEvaluator extends CachedExpressionEvaluator 
     /**
      * Clear all caches.
      */
-    void clear() {
+    public void clear() {
         this.keyCache.clear();
     }
 }

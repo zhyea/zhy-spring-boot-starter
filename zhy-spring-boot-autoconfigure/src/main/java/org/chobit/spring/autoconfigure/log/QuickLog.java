@@ -25,7 +25,7 @@ public @interface QuickLog {
     /**
      * 是否允许异常
      * <p>
-     * 出现异常时是否打印错误日志
+     * 出现异常时是否打印error级别的日志
      *
      * @return true 允许, false 不允许
      */

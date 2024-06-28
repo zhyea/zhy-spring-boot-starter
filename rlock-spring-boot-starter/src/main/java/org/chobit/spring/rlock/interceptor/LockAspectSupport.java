@@ -11,6 +11,7 @@ import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.cglib.proxy.Proxy;
 import org.springframework.context.expression.AnnotatedElementKey;
@@ -35,7 +36,7 @@ import static jodd.util.StringUtil.isBlank;
  *
  * @author robin
  */
-class LockAspectSupport implements BeanFactoryAware, InitializingBean {
+class LockAspectSupport implements BeanFactoryAware, InitializingBean, DisposableBean {
 
 
     private static final Logger logger = LoggerFactory.getLogger(LockAspectSupport.class);
@@ -180,6 +181,12 @@ class LockAspectSupport implements BeanFactoryAware, InitializingBean {
             this.metadataCache.put(operationKey, metadata);
         }
         return metadata;
+    }
+
+
+    @Override
+    public void destroy() throws Exception {
+        evaluator.clear();
     }
 
 
