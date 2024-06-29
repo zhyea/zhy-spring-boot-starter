@@ -27,7 +27,7 @@
 
 # @RLock
 
-基于redis的分布式锁，直接复用了redis的配置，因此要使用RLock分布式锁需要先添加redis的配置。
+基于redis实现的分布式锁，直接复用了redis的配置，因此要使用RLock分布式锁需要先添加redis的配置。
 
 启用RLock分布式锁需要在启动类上添加 `@EnableRLock` 注解。
 
