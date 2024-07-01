@@ -22,6 +22,8 @@ import static org.chobit.commons.constans.Symbol.EMPTY;
 
 
 /**
+ * Api返回值包装切面定义
+ *
  * @author robin
  */
 @RestControllerAdvice
