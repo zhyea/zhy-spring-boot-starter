@@ -56,6 +56,7 @@ public class TraceClewInterceptor implements MethodInterceptor, DisposableBean, 
             return invocation.proceed();
         }
 
+        // traceId不存在，需要手动填充
         traceId = inheritableTraceHolder.get(TRACE_ID);
         if (isBlank(traceId)) {
             traceId = StrKit.uuid();
@@ -65,13 +66,13 @@ public class TraceClewInterceptor implements MethodInterceptor, DisposableBean, 
             MDC.put(TRACE_ID, traceId);
             inheritableTraceHolder.put(TRACE_ID, traceId);
 
-            logger.info("===TraceClew=== Add traceId to method {}#{}", clazz, method.getName());
+            logger.debug("===TraceClew=== Add traceId to method {}#{}", clazz, method.getName());
 
             return invocation.proceed();
         } finally {
             MDC.remove(TRACE_ID);
             inheritableTraceHolder.remove(TRACE_ID);
-            logger.info("===TraceClew=== Statistic {}#{}, method cost:{} ms", clazz, method.getName(), System.currentTimeMillis() - start);
+            logger.debug("===TraceClew=== Statistic {}#{}, method cost:{} ms", clazz, method.getName(), System.currentTimeMillis() - start);
         }
     }
 
