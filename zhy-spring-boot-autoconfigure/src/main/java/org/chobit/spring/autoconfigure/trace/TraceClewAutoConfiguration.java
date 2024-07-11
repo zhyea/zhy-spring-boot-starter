@@ -2,6 +2,7 @@ package org.chobit.spring.autoconfigure.trace;
 
 
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Role;
@@ -22,9 +23,17 @@ public class TraceClewAutoConfiguration {
 
 
     @Bean
+    @ConditionalOnMissingBean(InheritableTraceHolder.class)
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-    public TraceClewInterceptor traceClewInterceptor() {
-        return new TraceClewInterceptor();
+    public InheritableTraceHolder inheritableTraceHolder() {
+        return new InheritableTraceHolder();
+    }
+
+
+    @Bean
+    @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
+    public TraceClewInterceptor traceClewInterceptor(InheritableTraceHolder inheritableTraceHolder) {
+        return new TraceClewInterceptor(inheritableTraceHolder);
     }
 
 
