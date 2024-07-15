@@ -27,51 +27,54 @@ public class TraceClewInterceptor implements MethodInterceptor, DisposableBean, 
     private static final Logger logger = LoggerFactory.getLogger(TraceClewInterceptor.class);
 
 
-    /**
-     * traceId字符串标记
-     */
-    private static final String TRACE_ID = "trace_id";
-
-
     private final InheritableTraceHolder inheritableTraceHolder;
 
 
-    public TraceClewInterceptor(InheritableTraceHolder inheritableTraceHolder) {
+    private final TraceClewProperties traceClewProperties;
+
+
+    public TraceClewInterceptor(InheritableTraceHolder inheritableTraceHolder, TraceClewProperties properties) {
         this.inheritableTraceHolder = inheritableTraceHolder;
+        this.traceClewProperties = properties;
     }
 
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
         long start = System.currentTimeMillis();
 
+        String traceFlag = traceClewProperties.getFlag();
+        if (isBlank(traceFlag)) {
+            traceFlag = "traceId";
+        }
+
         Method method = invocation.getMethod();
         String clazz = method.getDeclaringClass().getName();
 
-        String traceId = MDC.get(TRACE_ID);
+        String traceId = MDC.get(traceFlag);
 
         if (isNotBlank(traceId)) {
-            if (!Objects.equals(traceId, inheritableTraceHolder.get(TRACE_ID))) {
-                inheritableTraceHolder.put(TRACE_ID, traceId);
+            if (!Objects.equals(traceId, inheritableTraceHolder.get(traceFlag))) {
+                inheritableTraceHolder.put(traceFlag, traceId);
             }
             return invocation.proceed();
         }
 
         // traceId不存在，需要手动填充
-        traceId = inheritableTraceHolder.get(TRACE_ID);
+        traceId = inheritableTraceHolder.get(traceFlag);
         if (isBlank(traceId)) {
             traceId = StrKit.uuid();
+            inheritableTraceHolder.put(traceFlag, traceId);
         }
 
         try {
-            MDC.put(TRACE_ID, traceId);
-            inheritableTraceHolder.put(TRACE_ID, traceId);
+            MDC.put(traceFlag, traceId);
 
             logger.debug("===TraceClew=== Add traceId to method {}#{}", clazz, method.getName());
 
             return invocation.proceed();
         } finally {
-            MDC.remove(TRACE_ID);
-            inheritableTraceHolder.remove(TRACE_ID);
+            MDC.remove(traceFlag);
+            inheritableTraceHolder.remove(traceFlag);
             logger.debug("===TraceClew=== Statistic {}#{}, method cost:{} ms", clazz, method.getName(), System.currentTimeMillis() - start);
         }
     }
