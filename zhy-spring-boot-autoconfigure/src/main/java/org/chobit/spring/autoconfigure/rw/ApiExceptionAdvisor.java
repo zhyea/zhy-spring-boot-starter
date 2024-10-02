@@ -2,6 +2,7 @@ package org.chobit.spring.autoconfigure.rw;
 
 
 import org.chobit.commons.model.response.Result;
+import org.chobit.commons.utils.Collections2;
 import org.chobit.spring.autoconfigure.rw.exception.RwException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,8 +54,11 @@ public class ApiExceptionAdvisor {
 
 		Result<?> r = new Result<>(e.getCode());
 		r.setMsg(e.getMessage());
-
 		logger.warn("发现服务端异常：{}", r.getMsg(), e);
+
+		if(Collections2.isNotEmpty(rwProperties.getTags())){
+			r.setTags(rwProperties.getTags().toArray(new String[0]));
+		}
 
 		return r;
 	}
@@ -86,6 +90,10 @@ public class ApiExceptionAdvisor {
 
 		logger.warn("请求参数错误, total:{}, detail:{}", ex.getErrorCount(), logMsg);
 
+		if(Collections2.isNotEmpty(rwProperties.getTags())){
+			r.setTags(rwProperties.getTags().toArray(new String[0]));
+		}
+
 		return r;
 	}
 
@@ -110,6 +118,10 @@ public class ApiExceptionAdvisor {
 
 		logger.error("发现未知异常: {}", msg, ex);
 
+		if(Collections2.isNotEmpty(rwProperties.getTags())){
+			r.setTags(rwProperties.getTags().toArray(new String[0]));
+		}
+
 		return r;
 	}
 
@@ -129,6 +141,10 @@ public class ApiExceptionAdvisor {
 		r.setMsg("未知异常");
 
 		logger.error("发现未知异常: {}", r.getMsg(), e);
+
+		if(Collections2.isNotEmpty(rwProperties.getTags())){
+			r.setTags(rwProperties.getTags().toArray(new String[0]));
+		}
 
 		return r;
 	}
