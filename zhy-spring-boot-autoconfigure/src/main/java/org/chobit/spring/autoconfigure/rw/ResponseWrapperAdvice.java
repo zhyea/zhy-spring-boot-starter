@@ -65,18 +65,27 @@ public class ResponseWrapperAdvice implements ResponseBodyAdvice<Object> {
             return body;
         }
         if (selectedConverterType.equals(StringHttpMessageConverter.class)) {
-            return JsonKit.toJson(new Result<>(rwProperties.getSuccessCode(), body));
+            Result<?> result = new Result<>(rwProperties.getSuccessCode(), body);
+            this.setTag(returnType, result);
+            return JsonKit.toJson(result);
         }
 
         Result<?> result = new Result<>(body);
-
-        Tags tags = returnType.getMethodAnnotation(Tags.class);
-        if(null != tags && null!=tags.value() && tags.value().length > 0){
-            result.setTags(tags.value());
-        }else if(Collections2.isNotEmpty(rwProperties.getTags())){
-            result.setTags(rwProperties.getTags().toArray(new String[0]));
-        }
+        this.setTag(returnType, result);
 
         return result;
+    }
+
+
+    /**
+     * 设置返回结果中的标签
+     */
+    private void setTag(MethodParameter returnType, Result<?> result) {
+        Tags tags = returnType.getMethodAnnotation(Tags.class);
+        if (null != tags && null != tags.value() && tags.value().length > 0) {
+            result.setTags(tags.value());
+        } else if (Collections2.isNotEmpty(rwProperties.getTags())) {
+            result.setTags(rwProperties.getTags().toArray(new String[0]));
+        }
     }
 }
