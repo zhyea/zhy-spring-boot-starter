@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
+import static org.chobit.commons.utils.StrKit.join;
+
 
 /**
  * 接口异常处理
@@ -28,15 +30,18 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 @RestControllerAdvice
 public class ResponseWrapperAdvice implements ResponseBodyAdvice<Object> {
 
+
     private static final Logger logger = LoggerFactory.getLogger(ResponseWrapperAdvice.class);
 
     private final RwProperties rwProperties;
+
 
     @Autowired
     public ResponseWrapperAdvice(RwProperties rwProperties) {
         this.rwProperties = rwProperties;
         logger.debug("ApiResponseWrapper has been enabled.");
     }
+
 
     @Override
     public boolean supports(MethodParameter returnType,
@@ -83,9 +88,9 @@ public class ResponseWrapperAdvice implements ResponseBodyAdvice<Object> {
     private void setTag(MethodParameter returnType, Result<?> result) {
         Tags tags = returnType.getMethodAnnotation(Tags.class);
         if (null != tags && null != tags.value() && tags.value().length > 0) {
-            result.setTags(tags.value());
+            result.setTags(join(tags.value()));
         } else if (Collections2.isNotEmpty(rwProperties.getTags())) {
-            result.setTags(rwProperties.getTags().toArray(new String[0]));
+            result.setTags(join(rwProperties.getTags()));
         }
     }
 }

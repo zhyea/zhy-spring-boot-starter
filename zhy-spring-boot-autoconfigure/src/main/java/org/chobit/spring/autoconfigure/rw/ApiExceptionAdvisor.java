@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 
 import static org.chobit.commons.constans.Symbol.COMMA;
 import static org.chobit.commons.constans.Symbol.EMPTY;
+import static org.chobit.commons.utils.StrKit.join;
 
 
 /**
@@ -56,9 +57,7 @@ public class ApiExceptionAdvisor {
 		r.setMsg(e.getMessage());
 		logger.warn("发现服务端异常：{}", r.getMsg(), e);
 
-		if(Collections2.isNotEmpty(rwProperties.getTags())){
-			r.setTags(rwProperties.getTags().toArray(new String[0]));
-		}
+		wrapTags(r);
 
 		return r;
 	}
@@ -90,9 +89,7 @@ public class ApiExceptionAdvisor {
 
 		logger.warn("请求参数错误, total:{}, detail:{}", ex.getErrorCount(), logMsg);
 
-		if(Collections2.isNotEmpty(rwProperties.getTags())){
-			r.setTags(rwProperties.getTags().toArray(new String[0]));
-		}
+		wrapTags(r);
 
 		return r;
 	}
@@ -118,9 +115,7 @@ public class ApiExceptionAdvisor {
 
 		logger.error("发现未知异常: {}", msg, ex);
 
-		if(Collections2.isNotEmpty(rwProperties.getTags())){
-			r.setTags(rwProperties.getTags().toArray(new String[0]));
-		}
+		wrapTags(r);
 
 		return r;
 	}
@@ -142,11 +137,17 @@ public class ApiExceptionAdvisor {
 
 		logger.error("发现未知异常: {}", r.getMsg(), e);
 
-		if(Collections2.isNotEmpty(rwProperties.getTags())){
-			r.setTags(rwProperties.getTags().toArray(new String[0]));
-		}
+		wrapTags(r);
 
 		return r;
+	}
+
+
+
+	private void wrapTags(Result<?> result){
+		if(Collections2.isNotEmpty(rwProperties.getTags())){
+			result.setTags(join(rwProperties.getTags()));
+		}
 	}
 
 }
