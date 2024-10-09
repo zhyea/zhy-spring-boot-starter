@@ -12,7 +12,7 @@
 
     <groupId>org.chobit.spring</groupId>
     <artifactId>zhy-spring-boot-starter</artifactId>
-    <version>0.0.3-SNAPSHOT</version>
+    <version>0.0.3</version>
     <packaging>pom</packaging>
 
     <properties>
@@ -23,7 +23,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <spring.version>2.7.18</spring.version>
-        <zhy.common.version>0.1.3.5-SNAPSHOT</zhy.common.version>
+        <zhy.commons.version>0.1.3.5</zhy.commons.version>
     </properties>
 
 
@@ -50,12 +50,12 @@
             <dependency>
                 <groupId>org.chobit.commons</groupId>
                 <artifactId>common-utils</artifactId>
-                <version>${zhy.common.version}</version>
+                <version>${zhy.commons.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.chobit.commons</groupId>
                 <artifactId>common-model</artifactId>
-                <version>${zhy.common.version}</version>
+                <version>${zhy.commons.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.github.spotbugs</groupId>
@@ -85,5 +85,13 @@
             </plugin>
         </plugins>
     </build>
+
+
+    <scm>
+        <connection>scm:git:git@github.com:zhyea/zhy-spring-boot-starter.git</connection>
+        <developerConnection>scm:git:git@github.com:zhyea/zhy-spring-boot-starter.git</developerConnection>
+        <url>https://github.com/zhyea/zhy-spring-boot-starter</url>
+        <tag>oss-parent-0.1</tag>
+    </scm>
 
 </project>
