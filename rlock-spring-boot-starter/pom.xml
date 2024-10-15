@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.chobit.spring</groupId>
         <artifactId>zhy-spring-boot-starter</artifactId>
-        <version>0.0.3</version>
+        <version>0.0.4-SNAPSHOT</version>
     </parent>
 
     <artifactId>rlock-spring-boot-starter</artifactId>

@@ -12,40 +12,43 @@ import org.springframework.core.Ordered;
 /**
  * @author robin
  */
+@ConditionalOnMissingBean(TraceClewAutoConfiguration.class)
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(TraceClewProperties.class)
 @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 public class TraceClewAutoConfiguration {
 
 
-    @Bean
-    public TraceClewStarter traceClewStarter() {
-        return new TraceClewStarter();
-    }
+	@Bean
+	public TraceClewStarter traceClewStarter() {
+		return new TraceClewStarter();
+	}
 
 
-    @Bean
-    @ConditionalOnMissingBean(InheritableTraceHolder.class)
-    @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-    public InheritableTraceHolder inheritableTraceHolder() {
-        return new InheritableTraceHolder();
-    }
+	@Bean
+	@ConditionalOnMissingBean(InheritableTraceHolder.class)
+	@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
+	public InheritableTraceHolder inheritableTraceHolder() {
+		return new InheritableTraceHolder();
+	}
 
 
-    @Bean
-    @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-    public TraceClewInterceptor traceClewInterceptor(InheritableTraceHolder inheritableTraceHolder, TraceClewProperties properties) {
-        return new TraceClewInterceptor(inheritableTraceHolder, properties);
-    }
+	@ConditionalOnMissingBean(TraceClewInterceptor.class)
+	@Bean
+	@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
+	public TraceClewInterceptor traceClewInterceptor(InheritableTraceHolder inheritableTraceHolder, TraceClewProperties properties) {
+		return new TraceClewInterceptor(inheritableTraceHolder, properties);
+	}
 
 
-    @Bean
-    @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-    public TraceClewPointcutSourceAdvisor traceClewAdvisor(TraceClewInterceptor traceClewInterceptor) {
-        TraceClewPointcutSourceAdvisor advisor = new TraceClewPointcutSourceAdvisor();
-        advisor.setAdvice(traceClewInterceptor);
-        advisor.setOrder(Ordered.LOWEST_PRECEDENCE);
-        return advisor;
-    }
+	@ConditionalOnMissingBean(TraceClewPointcutSourceAdvisor.class)
+	@Bean
+	@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
+	public TraceClewPointcutSourceAdvisor traceClewAdvisor(TraceClewInterceptor traceClewInterceptor) {
+		TraceClewPointcutSourceAdvisor advisor = new TraceClewPointcutSourceAdvisor();
+		advisor.setAdvice(traceClewInterceptor);
+		advisor.setOrder(Ordered.LOWEST_PRECEDENCE);
+		return advisor;
+	}
 
 }
