@@ -32,7 +32,7 @@ public class RedisOperator {
 
     public <T> void addMessage(String queueName, Message<T> message) {
         assert message != null;
-        assert message.getTtlSeconds() != null;
+        assert message.getTimeToLiveSeconds() != null;
 
         String msgId = generateNextMessageID(queueName);
         message.setId(msgId);
@@ -46,13 +46,13 @@ public class RedisOperator {
     public <T> void saveMessage(String queueName, Message<T> message) {
         assert message != null;
         assert message.getId() != null;
-        assert message.getTtlSeconds() != null;
+        assert message.getTimeToLiveSeconds() != null;
 
         Map<String, String> asMap = messageConverter.toMap(message, payloadSerializer);
 
         String messageKey = keyForMessage(queueName, message.getId());
         redisTemplate.opsForHash().putAll(messageKey, asMap);
-        redisTemplate.expire(messageKey, message.getTtlSeconds(), TimeUnit.SECONDS);
+        redisTemplate.expire(messageKey, message.getTimeToLiveSeconds(), TimeUnit.SECONDS);
     }
 
     public <T> Message<T> loadMessageById(String queueName, String id, Class<T> payloadType) {

@@ -22,7 +22,7 @@ public class Message<T> {
 	/**
 	 * 消息留存时间，单位秒
 	 */
-	private Long ttlSeconds;
+	private Long timeToLiveSeconds;
 
 	/**
 	 * 消息重新消费次数
@@ -51,12 +51,12 @@ public class Message<T> {
 		this.creation = creation;
 	}
 
-	public Long getTtlSeconds() {
-		return ttlSeconds;
+	public Long getTimeToLiveSeconds() {
+		return timeToLiveSeconds;
 	}
 
-	public void setTtlSeconds(Long ttlSeconds) {
-		this.ttlSeconds = ttlSeconds;
+	public void setTimeToLiveSeconds(Long timeToLiveSeconds) {
+		this.timeToLiveSeconds = timeToLiveSeconds;
 	}
 
 	public int getRetryCount() {
