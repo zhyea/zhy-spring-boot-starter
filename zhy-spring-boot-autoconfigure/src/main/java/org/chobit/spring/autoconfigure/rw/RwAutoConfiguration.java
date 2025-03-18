@@ -16,7 +16,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
  *
  * @author robin
  */
-@ConditionalOnMissingBean(RwAutoConfiguration.class)
 @ConditionalOnClass({ResponseBodyAdvice.class, HttpMessageConverter.class})
 @ConditionalOnProperty(name = "rw.enabled", matchIfMissing = true)
 @EnableConfigurationProperties(RwProperties.class)
@@ -26,7 +25,6 @@ public class RwAutoConfiguration {
 
 
 
-	@ConditionalOnMissingBean(ResponseWrapperAdvice.class)
 	@Bean
 	public ResponseWrapperAdvice responseWrapperAdvice(RwProperties rwProperties) {
 		return new ResponseWrapperAdvice(rwProperties);
