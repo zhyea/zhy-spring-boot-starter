@@ -31,6 +31,7 @@
         <module>rlock-spring-boot-starter</module>
         <module>zhy-spring-boot-autoconfigure</module>
         <module>zhy-spring-common</module>
+        <module>redisq-spring-boot-starter</module>
     </modules>
 
     <dependencyManagement>
