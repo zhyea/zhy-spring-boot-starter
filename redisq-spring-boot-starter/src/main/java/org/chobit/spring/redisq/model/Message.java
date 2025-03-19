@@ -1,7 +1,7 @@
 package org.chobit.spring.redisq.model;
 
 
-import java.util.Calendar;
+import java.time.LocalDateTime;
 
 /**
  * 消息封装类
@@ -17,7 +17,7 @@ public class Message<T> {
 	private String id;
 
 
-	private Calendar creation;
+	private LocalDateTime creation;
 
 	/**
 	 * 消息留存时间，单位秒
@@ -43,11 +43,11 @@ public class Message<T> {
 		this.id = id;
 	}
 
-	public Calendar getCreation() {
+	public LocalDateTime getCreation() {
 		return creation;
 	}
 
-	public void setCreation(Calendar creation) {
+	public void setCreation(LocalDateTime creation) {
 		this.creation = creation;
 	}
 
