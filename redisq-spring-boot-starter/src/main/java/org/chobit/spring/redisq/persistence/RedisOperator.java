@@ -13,7 +13,7 @@ import static org.chobit.spring.redisq.tools.KeyFactory.*;
 public class RedisOperator {
 
 
-    private RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
 
     public RedisOperator(RedisTemplate<String, String> redisTemplate) {
         this.redisTemplate = redisTemplate;
