@@ -71,7 +71,7 @@ public class Message<T> {
 		return body;
 	}
 
-	public void setBody(T body) {
+	public void setPayload(T body) {
 		this.body = body;
 	}
 }

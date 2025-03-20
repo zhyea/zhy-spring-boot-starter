@@ -2,13 +2,15 @@ package org.chobit.spring.redisq.producer;
 
 import java.util.concurrent.TimeUnit;
 
-public interface MessageSender {
+public interface MessageSender<T> {
 
 
-	MessageSender withTimeToLive(long time, TimeUnit timeUnit);
+	MessageSender<T> withTimeToLive(long time, TimeUnit timeUnit);
 
 
-	MessageSender withTargetConsumer(String consumerId);
+	MessageSender<T> withTargetConsumer(String consumerId);
 
+
+	void submit();
 
 }

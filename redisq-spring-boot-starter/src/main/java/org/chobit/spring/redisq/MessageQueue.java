@@ -13,7 +13,7 @@ public interface MessageQueue {
      *
      * @return 队列名称
      */
-    String getTopicName();
+    String getQueueName();
 
     /**
      * 获取默认消费者ID

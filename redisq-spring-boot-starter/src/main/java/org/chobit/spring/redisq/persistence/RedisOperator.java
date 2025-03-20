@@ -1,5 +1,6 @@
 package org.chobit.spring.redisq.persistence;
 
+import org.chobit.commons.utils.Collections2;
 import org.chobit.spring.redisq.MessageQueue;
 import org.chobit.spring.redisq.model.Message;
 import org.chobit.spring.redisq.serialization.PayloadSerializer;
@@ -32,6 +33,11 @@ public class RedisOperator {
 		this.redisTemplate = redisTemplate;
 		this.payloadSerializer = payloadSerializer;
 	}
+
+	/**
+	 * 消息ID自增步长
+	 */
+	private static final Integer MESSAGE_ID_INCR_STEP = 1;
 
 
 	public void ensureConsumerRegistered(String queueName, String consumerId) {
@@ -102,7 +108,7 @@ public class RedisOperator {
 
 		String nextId = redisTemplate.boundListOps(queueKey)
 				.index(0);
-		if (nextId == null) {
+		if (isBlank(nextId)) {
 			return null;
 		}
 
@@ -110,18 +116,16 @@ public class RedisOperator {
 	}
 
 
-	/**
-	 * Peeks messages in the specified queue (for the specified consumer).
-	 *
-	 * @param rangeStart zero-based index of first item to retrieve
-	 * @param rangeEnd   zero-based index of last item to retrieve
-	 */
 	private <T> List<Message<T>> peekMessagesInQueue(String queueName, String consumerId, long rangeStart, long rangeEnd, Class<T> payloadType) {
 
 		String queueKey = keyForConsumerSpecificQueue(queueName, consumerId);
 
 		List<String> messageIds = redisTemplate.boundListOps(queueKey)
 				.range(rangeStart, rangeEnd);
+
+		if (Collections2.isEmpty(messageIds)) {
+			return new ArrayList<>(0);
+		}
 
 		List<Message<T>> messages = new ArrayList<>(messageIds.size());
 		for (String id : messageIds) {
@@ -131,15 +135,10 @@ public class RedisOperator {
 	}
 
 
-	/**
-	 * Peeks messages in the specified queue (for the default consumer).
-	 *
-	 * @param rangeStart zero-based index of first item to retrieve
-	 * @param rangeEnd   zero-based index of last item to retrieve
-	 */
 	public <T> List<Message<T>> peekMessagesInQueue(MessageQueue queue, long rangeStart, long rangeEnd, Class<T> payloadType) {
-		return peekMessagesInQueue(queue.getTopicName(), queue.getDefaultConsumerId(), rangeStart, rangeEnd, payloadType);
+		return peekMessagesInQueue(queue.getQueueName(), queue.getDefaultConsumerId(), rangeStart, rangeEnd, payloadType);
 	}
+
 
 	public void emptyQueue(String queueName) {
 		Collection<String> consumerIds = getRegisteredConsumers(queueName);
@@ -150,14 +149,23 @@ public class RedisOperator {
 		}
 	}
 
+
 	private String generateNextMessageId(String queueName) {
 		String keyOfNextId = keyForNextId(queueName);
-		return String.valueOf(redisTemplate.opsForValue().increment(keyOfNextId, 1));
+		Long nextId = redisTemplate.opsForValue().increment(keyOfNextId, MESSAGE_ID_INCR_STEP);
+
+		assert null != nextId;
+
+		return nextId.toString();
 	}
 
+
 	public Long getQueueSizeForConsumer(String queueName, String consumerId) {
-		return redisTemplate.opsForList().size(keyForConsumerSpecificQueue(queueName, consumerId));
+		String keyForConsumerSpecificQueue = keyForConsumerSpecificQueue(queueName, consumerId);
+		return redisTemplate.opsForList().size(keyForConsumerSpecificQueue);
 	}
+
+
 
 	public void enqueueMessageAtTail(String queueName, String consumerId, String messageId) {
 		if (isBlank(messageId)) {
@@ -169,6 +177,7 @@ public class RedisOperator {
 		redisTemplate.opsForList().rightPush(key, messageId);
 	}
 
+
 	public void enqueueMessageInSet(String queueName, String consumerId, String messageId) {
 		if (isBlank(messageId)) {
 			throw new IllegalArgumentException("Message must have been persisted before being enqueued.");
@@ -179,17 +188,20 @@ public class RedisOperator {
 		redisTemplate.opsForSet().add(key, messageId);
 	}
 
+
 	public void notifyWaitersOnSet(String queueName, String consumerId) {
 		String key = keyForConsumerSpecificQueueNotificationList(queueName, consumerId);
 
 		redisTemplate.opsForList().rightPush(key, "x");
 	}
 
+
 	public void waitOnSet(String queueName, String consumerId, long timeoutSeconds) {
 		String key = keyForConsumerSpecificQueueNotificationList(queueName, consumerId);
 
 		redisTemplate.opsForList().leftPop(key, timeoutSeconds, TimeUnit.SECONDS);
 	}
+
 
 	public String randomPopFromSet(String queueName, String consumerId) {
 		String key = keyForConsumerSpecificQueue(queueName, consumerId);
@@ -198,8 +210,10 @@ public class RedisOperator {
 		return ops.pop();
 	}
 
+
 	public boolean tryObtainLockForQueue(String queueName, String consumerId, long expirationTimeout, TimeUnit unit) {
-		BoundValueOperations<String, String> ops = redisTemplate.boundValueOps(keyForConsumerSpecificQueueLock(queueName, consumerId));
+		String keyForConsumerSpecificQueueLock = keyForConsumerSpecificQueueLock(queueName, consumerId);
+		BoundValueOperations<String, String> ops = redisTemplate.boundValueOps(keyForConsumerSpecificQueueLock);
 
 		boolean lockAcquired = ops.setIfAbsent("1");
 		if (lockAcquired) {
@@ -211,7 +225,8 @@ public class RedisOperator {
 
 
 	public void releaseLockForQueue(String queueName, String consumerId) {
-		redisTemplate.delete(keyForConsumerSpecificQueueLock(queueName, consumerId));
+		String keyForConsumerSpecificQueueLock = keyForConsumerSpecificQueueLock(queueName, consumerId);
+		redisTemplate.delete(keyForConsumerSpecificQueueLock);
 	}
 
 

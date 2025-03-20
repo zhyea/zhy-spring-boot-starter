@@ -50,7 +50,7 @@ class MessageConverter {
 		message.setId(data.get(ID_HASH_KEY));
 		message.setCreation(LocalDateKit.fromEpochMilli(Long.parseLong(data.get(CREATION_HASH_KEY))));
 		message.setTimeToLiveSeconds(Long.parseLong(data.get(TTL_HASH_KEY)));
-		message.setBody(payload);
+		message.setPayload(payload);
 
 		String retryCount = data.get(RETRY_COUNT);
 		if (null != retryCount) {
