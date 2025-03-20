@@ -36,15 +36,17 @@ public class RedisOperator {
 
 	public void ensureConsumerRegistered(String queueName, String consumerId) {
 		String registerConsumerKey = keyForRegisteredConsumers(queueName);
-		BoundSetOperations<String, String> ops = redisTemplate.boundSetOps(registerConsumerKey);
-		ops.add(consumerId);
+
+		redisTemplate.boundSetOps(registerConsumerKey)
+				.add(consumerId);
 	}
 
 
 	public Collection<String> getRegisteredConsumers(String queueName) {
 		String registerConsumerKey = keyForRegisteredConsumers(queueName);
-		BoundSetOperations<String, String> ops = redisTemplate.boundSetOps(registerConsumerKey);
-		return ops.members();
+
+		return redisTemplate.boundSetOps(registerConsumerKey)
+				.members();
 	}
 
 
@@ -90,16 +92,16 @@ public class RedisOperator {
 	public String dequeueMessageFromHead(String queueName, String consumerId, long timeoutSeconds) {
 		String queueKey = keyForConsumerSpecificQueue(queueName, consumerId);
 
-		BoundListOperations<String, String> ops = redisTemplate.boundListOps(queueKey);
-		return ops.leftPop(timeoutSeconds, TimeUnit.SECONDS);
+		return redisTemplate.boundListOps(queueKey)
+				.leftPop(timeoutSeconds, TimeUnit.SECONDS);
 	}
 
 
 	public <T> Message<T> peekNextMessageInQueue(String queueName, String consumerId, Class<T> payloadType) {
 		String queueKey = keyForConsumerSpecificQueue(queueName, consumerId);
 
-		BoundListOperations<String, String> ops = redisTemplate.boundListOps(queueKey);
-		String nextId = ops.index(0);
+		String nextId = redisTemplate.boundListOps(queueKey)
+				.index(0);
 		if (nextId == null) {
 			return null;
 		}
@@ -118,9 +120,9 @@ public class RedisOperator {
 
 		String queueKey = keyForConsumerSpecificQueue(queueName, consumerId);
 
-		BoundListOperations<String, String> ops = redisTemplate.boundListOps(queueKey);
+		List<String> messageIds = redisTemplate.boundListOps(queueKey)
+				.range(rangeStart, rangeEnd);
 
-		List<String> messageIds = ops.range(rangeStart, rangeEnd);
 		List<Message<T>> messages = new ArrayList<>(messageIds.size());
 		for (String id : messageIds) {
 			messages.add(loadMessageById(queueName, id, payloadType));
