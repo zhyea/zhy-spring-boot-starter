@@ -2,184 +2,215 @@ package org.chobit.spring.redisq.persistence;
 
 import org.chobit.spring.redisq.MessageQueue;
 import org.chobit.spring.redisq.model.Message;
+import org.chobit.spring.redisq.serialization.PayloadSerializer;
 import org.springframework.data.redis.core.*;
-import org.springframework.util.StringUtils;
 
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import static org.chobit.commons.utils.StrKit.isBlank;
 import static org.chobit.spring.redisq.tools.KeyFactory.*;
 
+
+/**
+ * redis 操作类
+ *
+ * @author robin
+ * @since 2021-03-20
+ */
 public class RedisOperator {
 
 
-    private final RedisTemplate<String, String> redisTemplate;
+	private final RedisTemplate<String, String> redisTemplate;
+	private final PayloadSerializer payloadSerializer;
 
-    public RedisOperator(RedisTemplate<String, String> redisTemplate) {
-        this.redisTemplate = redisTemplate;
-    }
+	public RedisOperator(RedisTemplate<String, String> redisTemplate, PayloadSerializer payloadSerializer) {
+		this.redisTemplate = redisTemplate;
+		this.payloadSerializer = payloadSerializer;
+	}
 
 
-    public void ensureConsumerRegistered(String queueName, String consumerId) {
-        BoundSetOperations<String, String> ops = redisTemplate.boundSetOps(keyForRegisteredConsumers(queueName));
-        ops.add(consumerId);
-    }
+	public void ensureConsumerRegistered(String queueName, String consumerId) {
+		String registerConsumerKey = keyForRegisteredConsumers(queueName);
+		BoundSetOperations<String, String> ops = redisTemplate.boundSetOps(registerConsumerKey);
+		ops.add(consumerId);
+	}
 
-    public Collection<String> getRegisteredConsumers(String queueName) {
-        BoundSetOperations<String, String> ops = redisTemplate.boundSetOps(keyForRegisteredConsumers(queueName));
-        return ops.members();
-    }
 
-    public <T> void addMessage(String queueName, Message<T> message) {
-        assert message != null;
-        assert message.getTimeToLiveSeconds() != null;
+	public Collection<String> getRegisteredConsumers(String queueName) {
+		String registerConsumerKey = keyForRegisteredConsumers(queueName);
+		BoundSetOperations<String, String> ops = redisTemplate.boundSetOps(registerConsumerKey);
+		return ops.members();
+	}
 
-        String msgId = generateNextMessageID(queueName);
-        message.setId(msgId);
-        if (message.getCreation() == null) {
-            message.setCreation(Calendar.getInstance());
-        }
 
-        saveMessage(queueName, message);
-    }
+	public <T> void addMessage(String queueName, Message<T> message) {
+		assert null != message;
+		assert null != message.getTimeToLiveSeconds();
 
-    public <T> void saveMessage(String queueName, Message<T> message) {
-        assert message != null;
-        assert message.getId() != null;
-        assert message.getTimeToLiveSeconds() != null;
+		String msgId = generateNextMessageId(queueName);
+		message.setId(msgId);
+		if (null == message.getCreation()) {
+			message.setCreation(LocalDateTime.now());
+		}
 
-        Map<String, String> asMap = messageConverter.toMap(message, payloadSerializer);
+		this.saveMessage(queueName, message);
+	}
 
-        String messageKey = keyForMessage(queueName, message.getId());
-        redisTemplate.opsForHash().putAll(messageKey, asMap);
-        redisTemplate.expire(messageKey, message.getTimeToLiveSeconds(), TimeUnit.SECONDS);
-    }
 
-    public <T> Message<T> loadMessageById(String queueName, String id, Class<T> payloadType) {
-        String messageKey = keyForMessage(queueName, id);
-        BoundHashOperations<String, String, String> ops = redisTemplate.boundHashOps(messageKey);
-        Map<String, String> messageData = ops.entries();
+	private <T> void saveMessage(String queueName, Message<T> message) {
 
-        return messageConverter.toMessage(messageData, payloadType, payloadSerializer);
-    }
+		assert null != message;
+		assert null != message.getTimeToLiveSeconds();
+		assert null != message.getId();
 
-    public String dequeueMessageFromHead(String queueName, String consumerId, long timeoutSeconds) {
-        String queueKey = keyForConsumerSpecificQueue(queueName, consumerId);
+		Map<String, String> map = MessageConverter.toMap(message, payloadSerializer);
 
-        BoundListOperations<String, String> ops = redisTemplate.boundListOps(queueKey);
-        return ops.leftPop(timeoutSeconds, TimeUnit.SECONDS);
-    }
+		String messageKey = keyForMessage(queueName, message.getId());
 
-    public <T> Message<T> peekNextMessageInQueue(String queueName, String consumerId, Class<T> payloadType) {
-        String queueKey = keyForConsumerSpecificQueue(queueName, consumerId);
+		redisTemplate.opsForHash().putAll(messageKey, map);
+		redisTemplate.expire(messageKey, message.getTimeToLiveSeconds(), TimeUnit.SECONDS);
+	}
 
-        BoundListOperations<String, String> ops = redisTemplate.boundListOps(queueKey);
 
-        String nextId = ops.index(0);
-        if (nextId == null) {
-            return null;
-        }
-        return loadMessageById(queueName, nextId, payloadType);
-    }
+	private <T> Message<T> loadMessageById(String queueName, String messageId, Class<T> payloadType) {
+		String messageKey = keyForMessage(queueName, messageId);
 
-    /**
-     * @param rangeStart zero-based index of first item to retrieve
-     * @param rangeEnd   zero-based index of last item to retrieve
-     */
-    private <T> List<Message<T>> peekMessagesInQueue(String queueName, String consumerId, long rangeStart, long rangeEnd, Class<T> payloadType) {
+		BoundHashOperations<String, String, String> ops = redisTemplate.boundHashOps(messageKey);
+		Map<String, String> messageData = ops.entries();
 
-        String queueKey = keyForConsumerSpecificQueue(queueName, consumerId);
+		return MessageConverter.toMessage(messageData, payloadSerializer, payloadType);
+	}
 
-        BoundListOperations<String, String> ops = redisTemplate.boundListOps(queueKey);
 
-        List<String> messageIds = ops.range(rangeStart, rangeEnd);
-        List<Message<T>> messages = new ArrayList<Message<T>>(messageIds.size());
-        for (String id : messageIds) {
-            messages.add(loadMessageById(queueName, id, payloadType));
-        }
-        return messages;
-    }
+	public String dequeueMessageFromHead(String queueName, String consumerId, long timeoutSeconds) {
+		String queueKey = keyForConsumerSpecificQueue(queueName, consumerId);
 
-    /**
-     * Peeks messages in the specified queue (for the default consumer).
-     *
-     * @param rangeStart zero-based index of first item to retrieve
-     * @param rangeEnd   zero-based index of last item to retrieve
-     */
-    public <T> List<Message<T>> peekMessagesInQueue(MessageQueue queue, long rangeStart, long rangeEnd, Class<T> payloadType) {
-        return peekMessagesInQueue(queue.getTopicName(), queue.getDefaultConsumerId(), rangeStart, rangeEnd, payloadType);
-    }
+		BoundListOperations<String, String> ops = redisTemplate.boundListOps(queueKey);
+		return ops.leftPop(timeoutSeconds, TimeUnit.SECONDS);
+	}
 
-    public void emptyQueue(String queueName) {
-        Collection<String> consumerIds = getRegisteredConsumers(queueName);
 
-        for (String consumerId : consumerIds) {
-            String queueKey = keyForConsumerSpecificQueue(queueName, consumerId);
-            redisTemplate.delete(queueKey);
-        }
-    }
+	public <T> Message<T> peekNextMessageInQueue(String queueName, String consumerId, Class<T> payloadType) {
+		String queueKey = keyForConsumerSpecificQueue(queueName, consumerId);
 
-    private String generateNextMessageID(String queueName) {
-        return String.valueOf(redisTemplate.opsForValue().increment(keyForNextID(queueName), 1));
-    }
+		BoundListOperations<String, String> ops = redisTemplate.boundListOps(queueKey);
+		String nextId = ops.index(0);
+		if (nextId == null) {
+			return null;
+		}
 
-    public Long getQueueSizeForConsumer(String queueName, String consumerId) {
-        return redisTemplate.opsForList().size(keyForConsumerSpecificQueue(queueName, consumerId));
-    }
+		return this.loadMessageById(queueName, nextId, payloadType);
+	}
 
-    public void enqueueMessageAtTail(String queueName, String consumerId, String messageId) {
-        if (isBlank(messageId)) {
-            throw new IllegalArgumentException("Message must have been persisted before being enqueued.");
-        }
 
-        String key = keyForConsumerSpecificQueue(queueName, consumerId);
+	/**
+	 * Peeks messages in the specified queue (for the specified consumer).
+	 *
+	 * @param rangeStart zero-based index of first item to retrieve
+	 * @param rangeEnd   zero-based index of last item to retrieve
+	 */
+	private <T> List<Message<T>> peekMessagesInQueue(String queueName, String consumerId, long rangeStart, long rangeEnd, Class<T> payloadType) {
 
-        redisTemplate.opsForList().rightPush(key, messageId);
-    }
+		String queueKey = keyForConsumerSpecificQueue(queueName, consumerId);
 
-    public void enqueueMessageInSet(String queueName, String consumerId, String messageId) {
-        if (StringUtils.isEmpty(messageId)) {
-            throw new IllegalArgumentException("Message must have been persisted before being enqueued.");
-        }
+		BoundListOperations<String, String> ops = redisTemplate.boundListOps(queueKey);
 
-        String key = keyForConsumerSpecificQueue(queueName, consumerId);
+		List<String> messageIds = ops.range(rangeStart, rangeEnd);
+		List<Message<T>> messages = new ArrayList<>(messageIds.size());
+		for (String id : messageIds) {
+			messages.add(loadMessageById(queueName, id, payloadType));
+		}
+		return messages;
+	}
 
-        redisTemplate.opsForSet().add(key, messageId);
-    }
 
-    public void notifyWaitersOnSet(String queueName, String consumerId) {
-        String key = keyForConsumerSpecificQueueNotificationList(queueName, consumerId);
+	/**
+	 * Peeks messages in the specified queue (for the default consumer).
+	 *
+	 * @param rangeStart zero-based index of first item to retrieve
+	 * @param rangeEnd   zero-based index of last item to retrieve
+	 */
+	public <T> List<Message<T>> peekMessagesInQueue(MessageQueue queue, long rangeStart, long rangeEnd, Class<T> payloadType) {
+		return peekMessagesInQueue(queue.getTopicName(), queue.getDefaultConsumerId(), rangeStart, rangeEnd, payloadType);
+	}
 
-        redisTemplate.opsForList().rightPush(key, "x");
-    }
+	public void emptyQueue(String queueName) {
+		Collection<String> consumerIds = getRegisteredConsumers(queueName);
 
-    public void waitOnSet(String queueName, String consumerId, long timeoutSeconds) {
-        String key = keyForConsumerSpecificQueueNotificationList(queueName, consumerId);
+		for (String consumerId : consumerIds) {
+			String queueKey = keyForConsumerSpecificQueue(queueName, consumerId);
+			redisTemplate.delete(queueKey);
+		}
+	}
 
-        redisTemplate.opsForList().leftPop(key, timeoutSeconds, TimeUnit.SECONDS);
-    }
+	private String generateNextMessageId(String queueName) {
+		String keyOfNextId = keyForNextId(queueName);
+		return String.valueOf(redisTemplate.opsForValue().increment(keyOfNextId, 1));
+	}
 
-    public String randomPopFromSet(String queueName, String consumerId) {
-        String key = keyForConsumerSpecificQueue(queueName, consumerId);
+	public Long getQueueSizeForConsumer(String queueName, String consumerId) {
+		return redisTemplate.opsForList().size(keyForConsumerSpecificQueue(queueName, consumerId));
+	}
 
-        BoundSetOperations<String, String> ops = redisTemplate.boundSetOps(key);
-        return ops.pop();
-    }
+	public void enqueueMessageAtTail(String queueName, String consumerId, String messageId) {
+		if (isBlank(messageId)) {
+			throw new IllegalArgumentException("Message must have been persisted before being enqueued.");
+		}
 
-    public boolean tryObtainLockForQueue(String queueName, String consumerId, long expirationTimeout, TimeUnit unit) {
-        BoundValueOperations<String, String> ops = redisTemplate.boundValueOps(keyForConsumerSpecificQueueLock(queueName, consumerId));
+		String key = keyForConsumerSpecificQueue(queueName, consumerId);
 
-        boolean lockAcquired = ops.setIfAbsent("1");
-        if (lockAcquired) {
-            ops.expire(expirationTimeout, unit);
-            return true;
-        }
-        return false;
-    }
+		redisTemplate.opsForList().rightPush(key, messageId);
+	}
 
-    public void releaseLockForQueue(String queueName, String consumerId) {
-        redisTemplate.delete(keyForConsumerSpecificQueueLock(queueName, consumerId));
-    }
+	public void enqueueMessageInSet(String queueName, String consumerId, String messageId) {
+		if (isBlank(messageId)) {
+			throw new IllegalArgumentException("Message must have been persisted before being enqueued.");
+		}
+
+		String key = keyForConsumerSpecificQueue(queueName, consumerId);
+
+		redisTemplate.opsForSet().add(key, messageId);
+	}
+
+	public void notifyWaitersOnSet(String queueName, String consumerId) {
+		String key = keyForConsumerSpecificQueueNotificationList(queueName, consumerId);
+
+		redisTemplate.opsForList().rightPush(key, "x");
+	}
+
+	public void waitOnSet(String queueName, String consumerId, long timeoutSeconds) {
+		String key = keyForConsumerSpecificQueueNotificationList(queueName, consumerId);
+
+		redisTemplate.opsForList().leftPop(key, timeoutSeconds, TimeUnit.SECONDS);
+	}
+
+	public String randomPopFromSet(String queueName, String consumerId) {
+		String key = keyForConsumerSpecificQueue(queueName, consumerId);
+
+		BoundSetOperations<String, String> ops = redisTemplate.boundSetOps(key);
+		return ops.pop();
+	}
+
+	public boolean tryObtainLockForQueue(String queueName, String consumerId, long expirationTimeout, TimeUnit unit) {
+		BoundValueOperations<String, String> ops = redisTemplate.boundValueOps(keyForConsumerSpecificQueueLock(queueName, consumerId));
+
+		boolean lockAcquired = ops.setIfAbsent("1");
+		if (lockAcquired) {
+			ops.expire(expirationTimeout, unit);
+			return true;
+		}
+		return false;
+	}
+
+
+	public void releaseLockForQueue(String queueName, String consumerId) {
+		redisTemplate.delete(keyForConsumerSpecificQueueLock(queueName, consumerId));
+	}
 
 
 }

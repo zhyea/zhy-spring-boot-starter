@@ -35,7 +35,7 @@ public final class KeyFactory {
         return String.format(REGISTERED_CONSUMERS_KEY_PATTERN, queue);
     }
 
-    public static String keyForNextID(String queue) {
+    public static String keyForNextId(String queue) {
         return String.format(NEXT_MESSAGE_ID_PATTERN, queue);
     }
 
