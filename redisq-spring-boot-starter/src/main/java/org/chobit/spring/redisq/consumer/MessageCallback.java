@@ -9,6 +9,6 @@ package org.chobit.spring.redisq.consumer;
 public interface MessageCallback {
 
 
-	void handle(String messageId);
+	void call(String messageId);
 
 }
