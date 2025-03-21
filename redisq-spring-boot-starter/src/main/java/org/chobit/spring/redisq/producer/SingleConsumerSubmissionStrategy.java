@@ -12,7 +12,7 @@ public class SingleConsumerSubmissionStrategy implements SubmissionStrategy {
 
 	@Override
 	public <T> void submit(MessageQueue queue, Message<T> message) {
-		submit(queue, message, queue.getDefaultConsumerId());
+		submit(queue, message, queue.defaultConsumerId());
 	}
 
 

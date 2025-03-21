@@ -136,7 +136,7 @@ public class RedisOperator {
 
 
 	public <T> List<Message<T>> peekMessagesInQueue(MessageQueue queue, long rangeStart, long rangeEnd, Class<T> payloadType) {
-		return peekMessagesInQueue(queue.getQueueName(), queue.getDefaultConsumerId(), rangeStart, rangeEnd, payloadType);
+		return peekMessagesInQueue(queue.getQueueName(), queue.defaultConsumerId(), rangeStart, rangeEnd, payloadType);
 	}
 
 
@@ -162,9 +162,9 @@ public class RedisOperator {
 
 	public Long getQueueSizeForConsumer(String queueName, String consumerId) {
 		String keyForConsumerSpecificQueue = keyForConsumerSpecificQueue(queueName, consumerId);
-		return redisTemplate.opsForList().size(keyForConsumerSpecificQueue);
+		Long size = redisTemplate.opsForList().size(keyForConsumerSpecificQueue);
+		return null == size ? 0 : size;
 	}
-
 
 
 	public void enqueueMessageAtTail(String queueName, String consumerId, String messageId) {
