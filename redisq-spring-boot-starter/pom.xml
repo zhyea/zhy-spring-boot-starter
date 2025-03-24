@@ -9,7 +9,7 @@
         <version>0.0.4-SNAPSHOT</version>
     </parent>
 
-    <artifactId>beetle-spring-boot-starter</artifactId>
+    <artifactId>redisq-spring-boot-starter</artifactId>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
