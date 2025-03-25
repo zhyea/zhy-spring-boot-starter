@@ -1,7 +1,5 @@
 package org.chobit.spring.redisq.beetle;
 
-import java.time.LocalDateTime;
-
 /**
  * 队列消息
  *
@@ -20,7 +18,7 @@ public class Message {
 	/**
 	 * 消息创建时间
 	 */
-	private LocalDateTime createTime;
+	private Long createTime;
 
 
 	/**
@@ -41,4 +39,43 @@ public class Message {
 	private String body;
 
 
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public Long getCreateTime() {
+		return createTime;
+	}
+
+	public void setCreateTime(Long createTime) {
+		this.createTime = createTime;
+	}
+
+	public Long getTtlSeconds() {
+		return ttlSeconds;
+	}
+
+	public void setTtlSeconds(Long ttlSeconds) {
+		this.ttlSeconds = ttlSeconds;
+	}
+
+	public int getRetryCount() {
+		return retryCount;
+	}
+
+	public void setRetryCount(int retryCount) {
+		this.retryCount = retryCount;
+	}
+
+	public String getBody() {
+		return body;
+	}
+
+	public void setBody(String body) {
+		this.body = body;
+	}
 }

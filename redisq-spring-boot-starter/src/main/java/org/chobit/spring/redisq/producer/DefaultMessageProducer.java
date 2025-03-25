@@ -104,7 +104,7 @@ public class DefaultMessageProducer<T> implements MessageProducer<T>, Initializi
 
 			redisOperator.addMessage(queue.getQueueName(), message);
 			if (isNotBlank(targetConsumer)) {
-				DefaultMessageSender.this.submit(message, targetConsumer);
+				//DefaultMessageSender.this.submit(message, targetConsumer);
 			}
 		}
 	}
