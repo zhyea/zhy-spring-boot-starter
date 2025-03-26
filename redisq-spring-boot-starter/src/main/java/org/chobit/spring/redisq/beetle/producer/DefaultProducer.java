@@ -25,6 +25,9 @@ public class DefaultProducer implements Producer {
 	public DefaultProducer(BeetleQueue queue,
 	                       Serializer serializer,
 	                       ProduceConfig produceConfig) {
+		assert null != queue;
+		assert null != serializer;
+
 		this.queue = queue;
 		this.serializer = serializer;
 		this.produceConfig = produceConfig;
@@ -33,7 +36,7 @@ public class DefaultProducer implements Producer {
 	@Override
 	public <T> void send(T payload) {
 		if(null == payload){
-			throw new BeetleException(format("payload is null, topic: [%s]", queue.topic()));
+			throw new BeetleException(format("payload is null, cannot be sent, topic: [%s]", queue.topic()));
 		}
 
 		String body = serializer.serialize(payload);

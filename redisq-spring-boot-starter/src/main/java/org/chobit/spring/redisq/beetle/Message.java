@@ -18,7 +18,7 @@ public class Message {
 	/**
 	 * 消息创建时间
 	 */
-	private Long createTime;
+	private long createTime;
 
 
 	/**
@@ -47,11 +47,11 @@ public class Message {
 		this.id = id;
 	}
 
-	public Long getCreateTime() {
+	public long getCreateTime() {
 		return createTime;
 	}
 
-	public void setCreateTime(Long createTime) {
+	public void setCreateTime(long createTime) {
 		this.createTime = createTime;
 	}
 
