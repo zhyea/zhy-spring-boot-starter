@@ -17,4 +17,8 @@ public interface Operator {
 	void addMessage(String topic, Message message);
 
 
+	void enqueueMessageAtTail(String topic, String consumerId, String messageId);
+
+
+	String dequeueMessageFromHead(String topic, String consumerId, long timeoutSeconds);
 }

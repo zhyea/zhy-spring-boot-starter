@@ -13,14 +13,14 @@ import static org.chobit.commons.utils.StrKit.isNotBlank;
  * @author robin
  * @since 2025/3/26 8:28
  */
-public final class MessageConverter {
+final class MessageConverter {
 
 
 	private static final String FIELD_ID = "id";
-	private static final String FIELD_CREATE_TIME = "createTime";
+	private static final String FIELD_CREATE_TIME = "ct";
 	private static final String FIELD_TTL = "ttl";
-	private static final String FIELD_RETRY_COUNT = "retries";
-	private static final String FIELD_PAYLOAD = "payload";
+	private static final String FIELD_RETRY_COUNT = "rc";
+	private static final String FIELD_PAYLOAD = "body";
 
 
 	static Map<String, String> toMap(Message message) {

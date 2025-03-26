@@ -1,5 +1,8 @@
 package org.chobit.spring.redisq;
 
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 /**
  * Redis客户端
  *
@@ -38,5 +41,23 @@ public interface RedisClient {
 	 */
 	void rightPush(String key, String value);
 
+
+	/**
+	 * 用于同时将多个 field-value (字段-值)对设置到hash中
+	 *
+	 * @param key hash key
+	 * @param map hash field/value集合
+	 */
+	void hmSet(String key, Map<String, String> map);
+
+
+	/**
+	 * 设置过期时间
+	 *
+	 * @param key               缓存key
+	 * @param expirationTimeout 过期时间
+	 * @param unit              时间单位
+	 */
+	void expire(String key, long expirationTimeout, TimeUnit unit);
 
 }

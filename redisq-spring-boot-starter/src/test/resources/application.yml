@@ -1,0 +1,12 @@
+#
+#
+#
+#
+#
+redisq:
+  config:
+    consumer-id-01:
+      topics: topic1, topic2
+      consumer:
+        processor: zhyyy
+        count: 3

@@ -3,6 +3,12 @@ package org.chobit.spring.redisq;
 import org.chobit.spring.redisq.beetle.Message;
 import org.chobit.spring.redisq.beetle.persistence.Operator;
 
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import static org.chobit.spring.redisq.Keys.keyForMessage;
+import static org.chobit.spring.redisq.Keys.keyForNextId;
+
 /**
  * Redis操作类
  *
@@ -23,7 +29,7 @@ public class RedisOperator implements Operator {
 
 	@Override
 	public String nextMessageId(String topic) {
-		String key = Keys.keyForNextId(topic);
+		String key = keyForNextId(topic);
 		Long id = redisClient.increment(key);
 
 		assert null != id;
@@ -35,8 +41,25 @@ public class RedisOperator implements Operator {
 	@Override
 	public void addMessage(String topic, Message message) {
 		assert null != message;
-		String messageId = nextMessageId(topic);
-		message.setId(messageId);
+		assert null != message.getTtlSeconds();
+
+		message.setId(nextMessageId(topic));
+
+		Map<String, String> map = MessageConverter.toMap(message);
+		String messageKey = keyForMessage(topic, message.getId());
+		redisClient.hmSet(messageKey, map);
+		redisClient.expire(messageKey, message.getTtlSeconds(), TimeUnit.SECONDS);
+	}
+
+
+	@Override
+	public void enqueueMessageAtTail(String topic, String consumerId, String messageId) {
+
+	}
+
+	@Override
+	public String dequeueMessageFromHead(String topic, String consumerId, long timeoutSeconds) {
+		return "";
 	}
 
 
