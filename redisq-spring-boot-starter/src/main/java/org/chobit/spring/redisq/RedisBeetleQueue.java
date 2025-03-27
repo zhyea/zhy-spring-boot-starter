@@ -3,8 +3,11 @@ package org.chobit.spring.redisq;
 import org.chobit.spring.redisq.beetle.BeetleQueue;
 import org.chobit.spring.redisq.beetle.Message;
 import org.chobit.spring.redisq.beetle.persistence.Operator;
+import org.chobit.spring.redisq.beetle.queue.QueueStrategy;
 
 import java.util.List;
+
+import static org.chobit.commons.utils.StrKit.isNotBlank;
 
 /**
  * 基于redis实现的Beetle队列
@@ -15,14 +18,24 @@ import java.util.List;
 public class RedisBeetleQueue implements BeetleQueue {
 
 
+	private final String topic;
+	private final QueueStrategy queueStrategy;
 	private final Operator operator;
 	private final List<String> consumerIds;
 
 
-	public RedisBeetleQueue(Operator operator, List<String> consumerIds) {
+	public RedisBeetleQueue(String topic,
+	                        QueueStrategy queueStrategy,
+	                        Operator operator,
+	                        List<String> consumerIds) {
 
+		assert isNotBlank(topic);
+		assert null != queueStrategy;
+		assert null != operator;
 		assert null != consumerIds && !consumerIds.isEmpty();
 
+		this.topic = topic;
+		this.queueStrategy = queueStrategy;
 		this.operator = operator;
 		this.consumerIds = consumerIds;
 	}
@@ -30,15 +43,15 @@ public class RedisBeetleQueue implements BeetleQueue {
 
 	@Override
 	public String topic() {
-		return "";
+		return topic;
 	}
 
 
 	@Override
 	public void enqueue(Message message) {
-		operator.addMessage(topic(), message);
+		operator.addMessage(topic, message);
 		for (String consumerId : this.consumerIds) {
-
+			queueStrategy.enqueue(topic, consumerId, message.getId());
 		}
 	}
 }

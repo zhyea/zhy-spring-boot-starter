@@ -33,9 +33,10 @@ public class DefaultProducer implements Producer {
 		this.produceConfig = produceConfig;
 	}
 
+	
 	@Override
-	public <T> void send(T payload) {
-		if(null == payload){
+	public <T> Message send(T payload) {
+		if (null == payload) {
 			throw new BeetleException(format("payload is null, cannot be sent, topic: [%s]", queue.topic()));
 		}
 
@@ -46,11 +47,19 @@ public class DefaultProducer implements Producer {
 		message.setCreateTime(System.currentTimeMillis());
 
 		queue.enqueue(message);
+
+		return message;
 	}
 
 
 	@Override
 	public <T> void send(T payload, ProduceCallback callback) {
-
+		Message message = null;
+		try {
+			message = this.send(payload);
+		} catch (Exception e) {
+			callback.onCompletion(null, e);
+		}
+		callback.onCompletion(message, null);
 	}
 }

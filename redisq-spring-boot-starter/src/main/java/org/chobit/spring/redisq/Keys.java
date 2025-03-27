@@ -13,12 +13,12 @@ final class Keys {
 	/**
 	 * 消息队列对应key模式
 	 */
-	private static final String PATTERN_QUEUE = "beetle.queue.%s";
+	private static final String PATTERN_QUEUE_CONSUMER = "beetle.%s.queue.%s";
 
 	/**
 	 * 消息ID对应key模式
 	 */
-	private static final String PATTERN_NEXT_MESSAGE_ID = "beetle.nextId.%s";
+	private static final String PATTERN_NEXT_MESSAGE_ID = "beetle.%s.nextId";
 
 	/**
 	 * 消息对应key模式
@@ -32,8 +32,8 @@ final class Keys {
 	 * @param topicName topic 名称
 	 * @return key
 	 */
-	static String keyForQueue(String topicName) {
-		return format(PATTERN_QUEUE, topicName);
+	static String keyForQueueConsumer(String topicName, String consumerId) {
+		return format(PATTERN_QUEUE_CONSUMER, topicName, consumerId);
 	}
 
 

@@ -6,8 +6,8 @@ import org.chobit.spring.redisq.beetle.persistence.Operator;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static org.chobit.spring.redisq.Keys.keyForMessage;
-import static org.chobit.spring.redisq.Keys.keyForNextId;
+import static org.chobit.commons.utils.StrKit.isBlank;
+import static org.chobit.spring.redisq.Keys.*;
 
 /**
  * Redis操作类
@@ -54,8 +54,14 @@ public class RedisOperator implements Operator {
 
 	@Override
 	public void enqueueMessageAtTail(String topic, String consumerId, String messageId) {
+		if(isBlank(messageId)){
+			throw new IllegalArgumentException("Message must have been persisted before being enqueued.");
+		}
+		String key = keyForQueueConsumer(topic, consumerId);
 
+		redisClient.rightPush(key, messageId);
 	}
+
 
 	@Override
 	public String dequeueMessageFromHead(String topic, String consumerId, long timeoutSeconds) {
