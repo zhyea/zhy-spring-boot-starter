@@ -4,6 +4,7 @@ import org.chobit.spring.redisq.beetle.BeetleQueue;
 import org.chobit.spring.redisq.beetle.Message;
 import org.chobit.spring.redisq.beetle.persistence.Operator;
 import org.chobit.spring.redisq.beetle.queue.QueueStrategy;
+import org.chobit.spring.redisq.beetle.queue.MessageCallback;
 
 import java.util.List;
 
@@ -49,9 +50,18 @@ public class RedisBeetleQueue implements BeetleQueue {
 
 	@Override
 	public void enqueue(Message message) {
+		// 保存消息
 		operator.addMessage(topic, message);
+		// 添加到消费队列
 		for (String consumerId : this.consumerIds) {
 			queueStrategy.enqueue(topic, consumerId, message.getId());
 		}
+	}
+
+
+
+	@Override
+	public void dequeue(String consumerId, MessageCallback callback) {
+		queueStrategy.dequeueNext(topic, consumerId, callback);
 	}
 }

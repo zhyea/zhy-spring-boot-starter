@@ -43,6 +43,16 @@ public interface RedisClient {
 
 
 	/**
+	 * 移除并返回列表的第一个元素
+	 *
+	 * @param key            key
+	 * @param timeoutSeconds 超时时间
+	 * @return 移除的元素
+	 */
+	String leftPop(String key, long timeoutSeconds);
+
+
+	/**
 	 * 用于同时将多个 field-value (字段-值)对设置到hash中
 	 *
 	 * @param key hash key

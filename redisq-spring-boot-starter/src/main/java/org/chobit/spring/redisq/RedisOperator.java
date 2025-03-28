@@ -65,6 +65,8 @@ public class RedisOperator implements Operator {
 
 	@Override
 	public String dequeueMessageFromHead(String topic, String consumerId, long timeoutSeconds) {
+		String key = keyForQueueConsumer(topic, consumerId);
+
 		return "";
 	}
 

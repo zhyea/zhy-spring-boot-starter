@@ -42,7 +42,7 @@ public class DefaultQueueStrategy implements QueueStrategy {
 	public void dequeueNext(String queueName, String consumerId, MessageCallback callback) {
 		String messageId = operator.dequeueMessageFromHead(queueName, consumerId, dequeueTimeoutSeconds);
 		if (isNotBlank(messageId)) {
-			logger.debug("Dequeued message ID [{}] from queue [{}({})]", messageId, queueName, consumerId);
+			logger.debug("Dequeued message id [{}] from queue [{}({})]", messageId, queueName, consumerId);
 			callback.handle(messageId);
 		}
 	}
