@@ -15,6 +15,9 @@ public class Message {
 	private String id;
 
 
+	private Long offset;
+
+
 	/**
 	 * 消息创建时间
 	 */

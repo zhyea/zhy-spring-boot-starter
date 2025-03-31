@@ -1,6 +1,8 @@
 package org.chobit.spring.redisq.beetle.queue;
 
 
+import org.chobit.spring.redisq.beetle.Message;
+
 /**
  * 消息出队入队策略
  *
@@ -24,9 +26,8 @@ public interface QueueStrategy {
 	 *
 	 * @param queueName  队列名称
 	 * @param consumerId 消费者名称
-	 * @param callback   下一个消息出队时的回调函数
 	 */
-	void dequeueNext(String queueName, String consumerId, MessageCallback callback);
+	Message dequeueNext(String queueName, String consumerId);
 
 
 }

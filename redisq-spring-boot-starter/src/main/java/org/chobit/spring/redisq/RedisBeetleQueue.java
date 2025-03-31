@@ -4,9 +4,10 @@ import org.chobit.spring.redisq.beetle.BeetleQueue;
 import org.chobit.spring.redisq.beetle.Message;
 import org.chobit.spring.redisq.beetle.persistence.Operator;
 import org.chobit.spring.redisq.beetle.queue.QueueStrategy;
-import org.chobit.spring.redisq.beetle.queue.MessageCallback;
 
+import javax.annotation.PostConstruct;
 import java.util.List;
+import java.util.Set;
 
 import static org.chobit.commons.utils.StrKit.isNotBlank;
 
@@ -48,20 +49,26 @@ public class RedisBeetleQueue implements BeetleQueue {
 	}
 
 
+	@PostConstruct
+	public void initialize() {
+		operator.registerConsumerId(topic, consumerIds);
+	}
+
+
 	@Override
 	public void enqueue(Message message) {
 		// 保存消息
 		operator.addMessage(topic, message);
 		// 添加到消费队列
-		for (String consumerId : this.consumerIds) {
+		Set<String> consumerIds = operator.getRegisteredConsumerIds(topic);
+		for (String consumerId : consumerIds) {
 			queueStrategy.enqueue(topic, consumerId, message.getId());
 		}
 	}
 
 
-
 	@Override
-	public void dequeue(String consumerId, MessageCallback callback) {
-		queueStrategy.dequeueNext(topic, consumerId, callback);
+	public Message dequeue(String consumerId) {
+		return queueStrategy.dequeueNext(topic, consumerId);
 	}
 }

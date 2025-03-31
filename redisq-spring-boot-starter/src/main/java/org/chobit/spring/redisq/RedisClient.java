@@ -1,6 +1,7 @@
 package org.chobit.spring.redisq;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -12,7 +13,14 @@ import java.util.concurrent.TimeUnit;
 public interface RedisClient {
 
 
-	void set(String key, String value, long ttl);
+	/**
+	 * 设置过期时间
+	 *
+	 * @param key               缓存key
+	 * @param expirationTimeout 过期时间
+	 * @param unit              时间单位
+	 */
+	void expire(String key, long expirationTimeout, TimeUnit unit);
 
 
 	/**
@@ -53,6 +61,24 @@ public interface RedisClient {
 
 
 	/**
+	 * 添加元素到set集合中
+	 *
+	 * @param key    key
+	 * @param values 要添加的元素
+	 */
+	void sAdd(String key, String... values);
+
+
+	/**
+	 * 根据key获取set集合中的所有元素
+	 *
+	 * @param key key
+	 * @return set集合中的所有元素
+	 */
+	Set<String> sMembers(String key);
+
+
+	/**
 	 * 用于同时将多个 field-value (字段-值)对设置到hash中
 	 *
 	 * @param key hash key
@@ -62,12 +88,11 @@ public interface RedisClient {
 
 
 	/**
-	 * 设置过期时间
+	 * 获取hash key对应的所有field/value集合
 	 *
-	 * @param key               缓存key
-	 * @param expirationTimeout 过期时间
-	 * @param unit              时间单位
+	 * @param key hash key
+	 * @return key对应的所有field/value集合
 	 */
-	void expire(String key, long expirationTimeout, TimeUnit unit);
+	Map<String, String> hGetAll(String key);
 
 }

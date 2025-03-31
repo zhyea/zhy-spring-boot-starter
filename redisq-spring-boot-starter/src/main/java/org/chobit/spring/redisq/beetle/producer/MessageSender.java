@@ -9,22 +9,21 @@ import org.chobit.spring.redisq.beetle.serialization.Serializer;
 import static java.lang.String.format;
 
 /**
- * 默认生产者
+ * 消息发送者
  *
  * @author robin
- * @since 2025/3/25 22:25
+ * @since 2025/3/30 21:51
  */
-public class DefaultProducer implements Producer {
-
+public class MessageSender implements Sender {
 
 	private final BeetleQueue queue;
 	private final Serializer serializer;
 	private final ProduceConfig produceConfig;
 
 
-	public DefaultProducer(BeetleQueue queue,
-	                       Serializer serializer,
-	                       ProduceConfig produceConfig) {
+	public MessageSender(BeetleQueue queue,
+	                     Serializer serializer,
+	                     ProduceConfig produceConfig) {
 		assert null != queue;
 		assert null != serializer;
 
@@ -33,7 +32,7 @@ public class DefaultProducer implements Producer {
 		this.produceConfig = produceConfig;
 	}
 
-	
+
 	@Override
 	public <T> Message send(T payload) {
 		if (null == payload) {
@@ -62,4 +61,5 @@ public class DefaultProducer implements Producer {
 		}
 		callback.onCompletion(message, null);
 	}
+
 }

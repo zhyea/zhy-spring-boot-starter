@@ -25,6 +25,11 @@ final class Keys {
 	 */
 	private static final String PATTERN_MESSAGE_KEY = "beetle.%s.msg.%s";
 
+	/**
+	 * 消息消费者对应key模式
+	 */
+	private static final String PATTERN_REGISTERED_CONSUMERS = "beetle.%s.consumers";
+
 
 	/**
 	 * 获取消息队列对应的key
@@ -57,6 +62,17 @@ final class Keys {
 	 */
 	static String keyForMessage(String topicName, String messageId) {
 		return format(PATTERN_MESSAGE_KEY, topicName, messageId);
+	}
+
+
+	/**
+	 * 获取已注册的消费者ID对应的key
+	 *
+	 * @param topicName topic名称
+	 * @return key
+	 */
+	static String keyForRegisteredConsumerIds(String topicName) {
+		return format(PATTERN_REGISTERED_CONSUMERS, topicName);
 	}
 
 }

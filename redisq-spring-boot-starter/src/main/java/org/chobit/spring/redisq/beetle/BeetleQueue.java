@@ -1,7 +1,5 @@
 package org.chobit.spring.redisq.beetle;
 
-import org.chobit.spring.redisq.beetle.queue.MessageCallback;
-
 /**
  * 消息队列数据存储抽象
  *
@@ -31,9 +29,8 @@ public interface BeetleQueue {
 	 * 消息出队
 	 *
 	 * @param consumerId 消费者ID
-	 * @param callback   回调函数
 	 */
-	void dequeue(String consumerId, MessageCallback callback);
+	Message dequeue(String consumerId);
 
 
 }

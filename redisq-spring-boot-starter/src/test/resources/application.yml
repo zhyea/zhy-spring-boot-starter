@@ -4,9 +4,15 @@
 #
 #
 redisq:
-  config:
-    consumer-id-01:
-      topics: topic1, topic2
-      consumer:
-        processor: zhyyy
-        count: 3
+  consumer:
+    - topic: topic1
+      consume-timeout: 1000
+      consume-threads: 3
+      retry:
+        type: multi
+        max: 3
+      processor: zhyyy
+  producer:
+    ttlSeconds: 60
+    serializer: org.chobit.spring.redisq.beetle.serialization.JacksonSerializer
+

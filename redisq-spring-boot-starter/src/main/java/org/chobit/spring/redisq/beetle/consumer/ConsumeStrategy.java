@@ -9,7 +9,7 @@ package org.chobit.spring.redisq.beetle.consumer;
 public interface ConsumeStrategy {
 
 
-	void start(String queueName, Runnable callback);
+	void start(String topic, Runnable callback);
 
 
 	void stop();

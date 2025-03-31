@@ -10,7 +10,8 @@ import java.io.IOException;
  * @author robin
  * @since 2025/3/27 8:29
  */
-public class JacksonCodec implements Serializer, Deserializer {
+public class JacksonSerializer implements Serializer {
+
 
 	private final ObjectMapper mapper = new ObjectMapper();
 
@@ -19,20 +20,6 @@ public class JacksonCodec implements Serializer, Deserializer {
 	public String serialize(Object payload) {
 		try {
 			return mapper.writeValueAsString(payload);
-		} catch (IOException e) {
-			throw new SerializationException("Could not serialize object using Jackson.", e);
-		}
-	}
-
-
-	@Override
-	public <T> T deserialize(String payload, Class<T> type) throws SerializationException {
-		if (payload == null) {
-			return null;
-		}
-
-		try {
-			return mapper.readValue(payload, type);
 		} catch (IOException e) {
 			throw new SerializationException("Could not serialize object using Jackson.", e);
 		}

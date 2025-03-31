@@ -1,5 +1,8 @@
 package org.chobit.spring.redisq.beetle.config;
 
+import org.chobit.spring.redisq.beetle.serialization.JacksonSerializer;
+import org.chobit.spring.redisq.beetle.serialization.Serializer;
+
 /**
  * 生产配置
  *
@@ -9,7 +12,15 @@ package org.chobit.spring.redisq.beetle.config;
 public class ProduceConfig {
 
 
+	/**
+	 * 消息缓存有效时间，单位秒
+	 */
 	Long ttlSeconds;
+
+	/**
+	 * 消息序列化器
+	 */
+	private Class<? extends Serializer> serializer = JacksonSerializer.class;
 
 
 	public Long getTtlSeconds() {
@@ -18,5 +29,13 @@ public class ProduceConfig {
 
 	public void setTtlSeconds(Long ttlSeconds) {
 		this.ttlSeconds = ttlSeconds;
+	}
+
+	public Class<? extends Serializer> getSerializer() {
+		return serializer;
+	}
+
+	public void setSerializer(Class<? extends Serializer> serializer) {
+		this.serializer = serializer;
 	}
 }

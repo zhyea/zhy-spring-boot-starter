@@ -23,6 +23,12 @@ final class MessageConverter {
 	private static final String FIELD_PAYLOAD = "body";
 
 
+	/**
+	 * 将消息转换为Map, 用于存储到Redis中
+	 *
+	 * @param message 消息
+	 * @return Map
+	 */
 	static Map<String, String> toMap(Message message) {
 
 		Map<String, String> result = new HashMap<>(8);
@@ -39,6 +45,12 @@ final class MessageConverter {
 	}
 
 
+	/**
+	 * 将Map转换为消息
+	 *
+	 * @param data Map
+	 * @return 消息
+	 */
 	static Message toMessage(Map<String, String> data) {
 		if (null == data || data.isEmpty()) {
 			return null;

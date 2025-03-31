@@ -3,11 +3,13 @@ package org.chobit.spring.redisq;
 import org.chobit.spring.redisq.beetle.Message;
 import org.chobit.spring.redisq.beetle.persistence.Operator;
 
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static org.chobit.commons.utils.StrKit.isBlank;
 import static org.chobit.spring.redisq.Keys.*;
+import static org.chobit.spring.redisq.MessageConverter.toMap;
+import static org.chobit.spring.redisq.MessageConverter.toMessage;
 
 /**
  * Redis操作类
@@ -24,6 +26,22 @@ public class RedisOperator implements Operator {
 	public RedisOperator(RedisClient redisClient) {
 		assert null != redisClient;
 		this.redisClient = redisClient;
+	}
+
+
+	@Override
+	public void registerConsumerId(String topic, List<String> consumerIds) {
+		String key = keyForRegisteredConsumerIds(topic);
+		String[] consumers = consumerIds.toArray(new String[0]);
+
+		redisClient.sAdd(key, consumers);
+	}
+
+
+	@Override
+	public Set<String> getRegisteredConsumerIds(String topic) {
+		String key = keyForRegisteredConsumerIds(topic);
+		return redisClient.sMembers(key);
 	}
 
 
@@ -45,7 +63,7 @@ public class RedisOperator implements Operator {
 
 		message.setId(nextMessageId(topic));
 
-		Map<String, String> map = MessageConverter.toMap(message);
+		Map<String, String> map = toMap(message);
 		String messageKey = keyForMessage(topic, message.getId());
 		redisClient.hmSet(messageKey, map);
 		redisClient.expire(messageKey, message.getTtlSeconds(), TimeUnit.SECONDS);
@@ -54,7 +72,7 @@ public class RedisOperator implements Operator {
 
 	@Override
 	public void enqueueMessageAtTail(String topic, String consumerId, String messageId) {
-		if(isBlank(messageId)){
+		if (isBlank(messageId)) {
 			throw new IllegalArgumentException("Message must have been persisted before being enqueued.");
 		}
 		String key = keyForQueueConsumer(topic, consumerId);
@@ -67,7 +85,17 @@ public class RedisOperator implements Operator {
 	public String dequeueMessageFromHead(String topic, String consumerId, long timeoutSeconds) {
 		String key = keyForQueueConsumer(topic, consumerId);
 
-		return "";
+		return redisClient.leftPop(key, timeoutSeconds);
+	}
+
+
+	@Override
+	public Message loadMessage(String topic, String messageId) {
+		String key = keyForMessage(topic, messageId);
+
+		Map<String, String> map = redisClient.hGetAll(key);
+
+		return toMessage(map);
 	}
 
 

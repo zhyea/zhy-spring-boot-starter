@@ -1,5 +1,6 @@
 package org.chobit.spring.redisq.beetle.queue;
 
+import org.chobit.spring.redisq.beetle.Message;
 import org.chobit.spring.redisq.beetle.persistence.Operator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,13 +22,14 @@ public class DefaultQueueStrategy implements QueueStrategy {
 	/**
 	 * 默认的dequeue超时时间
 	 */
-	private long dequeueTimeoutSeconds = 1L;
+	private long dequeueTimeoutMillis = 1L;
 
 
 	private final Operator operator;
 
-	public DefaultQueueStrategy(Operator operator) {
+	public DefaultQueueStrategy(Operator operator, long dequeueTimeoutMillis) {
 		this.operator = operator;
+		this.dequeueTimeoutMillis = dequeueTimeoutMillis;
 	}
 
 
@@ -39,16 +41,12 @@ public class DefaultQueueStrategy implements QueueStrategy {
 
 
 	@Override
-	public void dequeueNext(String queueName, String consumerId, MessageCallback callback) {
-		String messageId = operator.dequeueMessageFromHead(queueName, consumerId, dequeueTimeoutSeconds);
+	public Message dequeueNext(String queueName, String consumerId) {
+		String messageId = operator.dequeueMessageFromHead(queueName, consumerId, dequeueTimeoutMillis);
 		if (isNotBlank(messageId)) {
 			logger.debug("Dequeued message id [{}] from queue [{}({})]", messageId, queueName, consumerId);
-			callback.handle(messageId);
+			return operator.loadMessage(queueName, messageId);
 		}
-	}
-
-
-	public void setDequeueTimeoutSeconds(long dequeueTimeoutSeconds) {
-		this.dequeueTimeoutSeconds = dequeueTimeoutSeconds;
+		return null;
 	}
 }
