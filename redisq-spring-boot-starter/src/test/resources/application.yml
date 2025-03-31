@@ -13,6 +13,7 @@ redisq:
         max: 3
       processor: zhyyy
   producer:
-    ttlSeconds: 60
-    serializer: org.chobit.spring.redisq.beetle.serialization.JacksonSerializer
+    - topic: topic1
+      ttlSeconds: 60
+      serializer: org.chobit.spring.redisq.beetle.serialization.JacksonSerializer
 

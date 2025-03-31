@@ -13,6 +13,11 @@ public class ProduceConfig {
 
 
 	/**
+	 * 要写入的topic
+	 */
+	private String topic;
+
+	/**
 	 * 消息缓存有效时间，单位秒
 	 */
 	Long ttlSeconds;
@@ -22,6 +27,14 @@ public class ProduceConfig {
 	 */
 	private Class<? extends Serializer> serializer = JacksonSerializer.class;
 
+
+	public String getTopic() {
+		return topic;
+	}
+
+	public void setTopic(String topic) {
+		this.topic = topic;
+	}
 
 	public Long getTtlSeconds() {
 		return ttlSeconds;

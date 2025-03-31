@@ -15,4 +15,10 @@ public class NoRetryStrategy implements MessageRetryStrategy {
 	public void retry(Message message, BeetleQueue queue, String consumerId) {
 		// no-op
 	}
+
+	private static final NoRetryStrategy instance = new NoRetryStrategy();
+
+	public static NoRetryStrategy getInstance() {
+		return instance;
+	}
 }

@@ -6,7 +6,6 @@ import org.chobit.spring.redisq.beetle.consumer.retry.MessageRetryStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import static org.chobit.commons.utils.StrKit.isNotBlank;
@@ -39,12 +38,6 @@ public class MessageConsumer {
 		this.queue = queue;
 		this.consumeStrategy = consumeStrategy;
 		this.retryStrategy = retryStrategy;
-	}
-
-
-	@PostConstruct
-	public void initialize() {
-		this.start();
 	}
 
 
