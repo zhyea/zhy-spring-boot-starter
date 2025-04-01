@@ -5,7 +5,7 @@ import org.chobit.commons.utils.Collections2;
 import org.chobit.spring.redisq.beetle.BeetleQueue;
 import org.chobit.spring.redisq.beetle.config.ConsumeConfig;
 import org.chobit.spring.redisq.beetle.config.ProduceConfig;
-import org.chobit.spring.redisq.beetle.constants.RetryStrategyType;
+import org.chobit.spring.redisq.beetle.constants.RetryStrategyEnum;
 import org.chobit.spring.redisq.beetle.consumer.ConsumeStrategy;
 import org.chobit.spring.redisq.beetle.consumer.IProcessor;
 import org.chobit.spring.redisq.beetle.consumer.MessageConsumer;
@@ -189,7 +189,8 @@ public class RedisQContext implements SmartInitializingSingleton, DisposableBean
 		for (ProduceConfig cfg : this.properties.getProducer()) {
 			Serializer serializer = cfg.getSerializer().newInstance();
 			BeetleQueue queue = topicProducerQueueMap.get(cfg.getTopic());
-			MessageSender sender = new MessageSender(queue, serializer, cfg);
+			Integer maxRetryCount = this.properties.getMaxRetryCount();
+			MessageSender sender = new MessageSender(queue, serializer, cfg, maxRetryCount);
 
 			senders.put(cfg.getTopic(), sender);
 		}
@@ -240,8 +241,8 @@ public class RedisQContext implements SmartInitializingSingleton, DisposableBean
 	 * @param retryMax      最大重试次数
 	 * @return 重试策略
 	 */
-	private MessageRetryStrategy buildRetryStrategy(RetryStrategyType retryStrategy, Integer retryMax) {
-		if (retryStrategy == RetryStrategyType.NO) {
+	private MessageRetryStrategy buildRetryStrategy(RetryStrategyEnum retryStrategy, Integer retryMax) {
+		if (retryStrategy == RetryStrategyEnum.NO) {
 			return NoRetryStrategy.getInstance();
 		}
 

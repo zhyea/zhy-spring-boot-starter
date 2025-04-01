@@ -30,6 +30,11 @@ public class Message {
 	/**
 	 * 消息消费重试次数
 	 */
+	private int maxRetryCount;
+
+	/**
+	 * 消息消费重试次数
+	 */
 	private int leftRetryCount;
 
 	/**
@@ -60,6 +65,14 @@ public class Message {
 
 	public void setTtlSeconds(Long ttlSeconds) {
 		this.ttlSeconds = ttlSeconds;
+	}
+
+	public int getMaxRetryCount() {
+		return maxRetryCount;
+	}
+
+	public void setMaxRetryCount(int maxRetryCount) {
+		this.maxRetryCount = maxRetryCount;
 	}
 
 	public int getLeftRetryCount() {

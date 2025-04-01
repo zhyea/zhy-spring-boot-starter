@@ -19,17 +19,20 @@ public class MessageSender implements Sender {
 	private final BeetleQueue queue;
 	private final Serializer serializer;
 	private final ProduceConfig produceConfig;
+	private final Integer maxRetryCount;
 
 
 	public MessageSender(BeetleQueue queue,
 	                     Serializer serializer,
-	                     ProduceConfig produceConfig) {
+	                     ProduceConfig produceConfig,
+	                     Integer maxRetryCount) {
 		assert null != queue;
 		assert null != serializer;
 
 		this.queue = queue;
 		this.serializer = serializer;
 		this.produceConfig = produceConfig;
+		this.maxRetryCount = maxRetryCount;
 	}
 
 
@@ -44,6 +47,10 @@ public class MessageSender implements Sender {
 		message.setBody(body);
 		message.setTtlSeconds(produceConfig.getTtlSeconds());
 		message.setCreateTime(System.currentTimeMillis());
+
+		int maxRetry = (null == maxRetryCount ? 0 : maxRetryCount);
+		message.setMaxRetryCount(maxRetry);
+		message.setLeftRetryCount(maxRetry);
 
 		queue.enqueue(message);
 

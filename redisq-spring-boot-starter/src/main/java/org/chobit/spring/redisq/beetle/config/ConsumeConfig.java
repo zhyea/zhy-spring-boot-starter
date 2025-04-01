@@ -1,6 +1,6 @@
 package org.chobit.spring.redisq.beetle.config;
 
-import org.chobit.spring.redisq.beetle.constants.RetryStrategyType;
+import org.chobit.spring.redisq.beetle.constants.RetryStrategyEnum;
 
 /**
  * 消费者配置
@@ -39,7 +39,7 @@ public class ConsumeConfig {
     /**
      * 消费重试配置
      */
-    private RetryStrategyType retry;
+    private RetryStrategyEnum retry;
 
 
     public String getTopic() {
@@ -82,11 +82,11 @@ public class ConsumeConfig {
         this.processor = processor;
     }
 
-    public RetryStrategyType getRetry() {
+    public RetryStrategyEnum getRetry() {
         return retry;
     }
 
-    public void setRetry(RetryStrategyType retry) {
+    public void setRetry(RetryStrategyEnum retry) {
         this.retry = retry;
     }
 }

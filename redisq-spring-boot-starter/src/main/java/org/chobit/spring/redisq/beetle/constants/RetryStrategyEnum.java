@@ -6,19 +6,19 @@ package org.chobit.spring.redisq.beetle.constants;
  * @author robin
  * @since 2025/3/30 12:04
  */
-public enum RetryStrategyType {
+public enum RetryStrategyEnum {
 
 
-    /**
-     * 不重试
-     */
-    NO,
+	/**
+	 * 不重试
+	 */
+	NO,
 
 
-    /**
-     * 多次重试
-     */
-    MULTI,
-    ;
+	/**
+	 * 多次重试
+	 */
+	MULTI,
+	;
 
 }
