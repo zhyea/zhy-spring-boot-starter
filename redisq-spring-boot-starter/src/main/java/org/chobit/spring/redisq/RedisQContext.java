@@ -28,6 +28,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static org.chobit.commons.utils.StrKit.isBlank;
 
 /**
  * RedisQ启动器
@@ -36,245 +40,288 @@ import java.util.concurrent.CountDownLatch;
  * @since 2025/3/30 22:16
  */
 public class RedisQContext
-		implements SmartInitializingSingleton, DisposableBean, BeanPostProcessor, ApplicationContextAware {
+        implements SmartInitializingSingleton, DisposableBean, BeanPostProcessor, ApplicationContextAware {
 
 
-	private final BeetleProperties properties;
+    private final BeetleProperties properties;
 
 
-	private final RedisOperator redisOperator;
-	private final QueueStrategy queueStrategy;
+    private final RedisOperator redisOperator;
+    private final QueueStrategy queueStrategy;
 
 
-	private final Map<String, BeetleQueue> topicProducerQueueMap;
+    private final Map<String, BeetleQueue> topicProducerQueueMap;
 
-	private final Map<String, Set<String>> topicConsumerIdMap;
-	private final Map<String, BeetleQueue> topicConsumerQueueMap;
-	private final Map<String, BeetleQueue> consumerIdQueueMap;
+    private final Map<String, Set<String>> topicConsumerIdMap;
+    private final Map<String, BeetleQueue> topicConsumerQueueMap;
+    private final Map<String, BeetleQueue> consumerIdQueueMap;
 
-	private final MessageProducer producer;
-	private final Map<String, MessageConsumer> consumers;
-	private final Map<String, String> consumerProcessors;
-	private final Map<String, Set<String>> expectedProcessors = new HashMap<>(4);
+    private final MessageProducer producer;
+    private final Map<String, MessageConsumer> consumers;
+    private final Map<String, Set<String>> expectedProcessors = new HashMap<>(4);
 
-	private final CountDownLatch startupLatch;
-
-
-	public RedisQContext(BeetleProperties properties,
-	                     RedisTemplate<String, String> redisTemplate) throws Exception {
-		this.properties = properties;
-
-		RedisClient redisClient = new RedisClientImpl(redisTemplate);
-		this.redisOperator = new RedisOperator(redisClient);
-		this.queueStrategy = new DefaultQueueStrategy(redisOperator, properties.getDequeueTimeout());
-
-		this.topicProducerQueueMap = buildTopicProducerQueues();
-		this.producer = buildProducer();
-
-		this.topicConsumerIdMap = buildTopicConsumerIdMap();
-		this.topicConsumerQueueMap = buildTopicConsumerQueues();
-		this.consumerIdQueueMap = mapConsumeQueue();
-		this.consumerProcessors = new HashMap<>(4);
-		this.consumers = buildConsumers();
-
-		int totalConsumers = properties.totalConsumers();
-		this.startupLatch = new CountDownLatch(totalConsumers);
-	}
+    private final AtomicBoolean startConsumerSignal = new AtomicBoolean(false);
+    private final AtomicBoolean destroySignal = new AtomicBoolean(false);
+    private final CountDownLatch startupLatch;
 
 
-	private Map<String, BeetleQueue> buildTopicProducerQueues() {
-		List<ProduceConfig> configs = this.properties.getProducer();
-		if (Collections2.isEmpty(configs)) {
-			return new HashMap<>(0);
-		}
+    public RedisQContext(BeetleProperties properties,
+                         RedisTemplate<String, String> redisTemplate) throws Exception {
+        this.properties = properties;
 
-		Map<String, BeetleQueue> result = new HashMap<>(configs.size());
+        RedisClient redisClient = new RedisClientImpl(redisTemplate);
+        this.redisOperator = new RedisOperator(redisClient);
+        this.queueStrategy = new DefaultQueueStrategy(redisOperator, properties.getDequeueTimeout());
 
-		for (ProduceConfig cfg : configs) {
-			String topic = cfg.getTopic();
-			List<String> consumerIds = new ArrayList<>(redisOperator.getRegisteredConsumerIds(topic));
-			BeetleQueue queue = new RedisBeetleQueue(topic, queueStrategy, redisOperator, consumerIds);
-			result.put(cfg.getTopic(), queue);
-		}
-		return result;
-	}
+        this.topicProducerQueueMap = buildTopicProducerQueues();
+        this.producer = buildProducer();
 
+        this.topicConsumerIdMap = buildTopicConsumerIdMap();
+        this.topicConsumerQueueMap = buildTopicConsumerQueues();
+        this.consumerIdQueueMap = mapConsumeQueue();
+        this.consumers = buildConsumers();
 
-	/**
-	 * 构建topic和consumerId的映射关系
-	 *
-	 * @return topic和consumerId的映射关系
-	 */
-	private Map<String, Set<String>> buildTopicConsumerIdMap() {
-		if (Collections2.isEmpty(this.properties.getConsumer())) {
-			return new HashMap<>(0);
-		}
-
-		Map<String, Set<String>> result = new HashMap<>();
-
-		for (ConsumeConfig cfg : this.properties.getConsumer()) {
-			Set<String> consumerIds = result.computeIfAbsent(cfg.getTopic(), k -> new HashSet<>());
-			consumerIds.add(cfg.getConsumerId());
-		}
-
-		return result;
-	}
+        int totalConsumers = properties.totalConsumers();
+        this.startupLatch = new CountDownLatch(totalConsumers);
+    }
 
 
-	/**
-	 * 构建队列
-	 *
-	 * @return topic 和 消费队列的映射
-	 */
-	private Map<String, BeetleQueue> buildTopicConsumerQueues() {
-		if (Collections2.isEmpty(this.topicConsumerIdMap)) {
-			new HashMap<>(0);
-		}
+    /**
+     * 构建topic和消息队列的映射关系
+     *
+     * @return topic和消息队列的映射
+     */
+    private Map<String, BeetleQueue> buildTopicProducerQueues() {
+        List<ProduceConfig> configs = this.properties.getProducer();
+        if (Collections2.isEmpty(configs)) {
+            return new HashMap<>(0);
+        }
 
-		final Map<String, BeetleQueue> result = new HashMap<>(this.topicConsumerIdMap.size());
+        Map<String, BeetleQueue> result = new HashMap<>(configs.size());
 
-		this.topicConsumerIdMap.forEach((topic, configs) -> {
-			BeetleQueue queue = new RedisBeetleQueue(topic, queueStrategy, redisOperator, new ArrayList<>(configs));
-			result.put(topic, queue);
-		});
-
-		return result;
-	}
-
-
-	/**
-	 * 构建消费ID和队列的映射关系
-	 *
-	 * @return 消费ID和队列的映射关系
-	 */
-	private Map<String, BeetleQueue> mapConsumeQueue() {
-		if (Collections2.isEmpty(this.topicConsumerQueueMap)
-				|| Collections2.isEmpty(this.topicConsumerIdMap)) {
-			return new HashMap<>(0);
-		}
-
-		Map<String, BeetleQueue> result = new HashMap<>(this.topicConsumerIdMap.size());
-
-		this.topicConsumerQueueMap.forEach((topic, queue) -> {
-			Set<String> consumerIds = this.topicConsumerIdMap.get(topic);
-			assert null != consumerIds && !consumerIds.isEmpty();
-
-			consumerIds.forEach(e -> result.put(e, queue));
-		});
-
-		return result;
-	}
+        for (ProduceConfig cfg : configs) {
+            String topic = cfg.getTopic();
+            List<String> consumerIds = new ArrayList<>(redisOperator.getRegisteredConsumerIds(topic));
+            BeetleQueue queue = new RedisBeetleQueue(topic, queueStrategy, redisOperator, consumerIds);
+            result.put(cfg.getTopic(), queue);
+        }
+        return result;
+    }
 
 
-	/**
-	 * 构建消息生产者
-	 *
-	 * @return 消息生产者
-	 * @throws Exception 异常信息
-	 */
-	private MessageProducer buildProducer() throws Exception {
-		if (Collections2.isEmpty(this.properties.getProducer())) {
-			return null;
-		}
+    /**
+     * 构建topic和consumerId的映射关系
+     *
+     * @return topic和consumerId的映射关系
+     */
+    private Map<String, Set<String>> buildTopicConsumerIdMap() {
+        if (Collections2.isEmpty(this.properties.getConsumer())) {
+            return new HashMap<>(0);
+        }
 
-		Map<String, Sender> senders = new HashMap<>(this.properties.getProducer().size());
+        Map<String, Set<String>> result = new HashMap<>();
 
-		for (ProduceConfig cfg : this.properties.getProducer()) {
-			Serializer serializer = cfg.getSerializer().newInstance();
-			BeetleQueue queue = topicProducerQueueMap.get(cfg.getTopic());
-			MessageSender sender = new MessageSender(queue, serializer, cfg);
+        for (ConsumeConfig cfg : this.properties.getConsumer()) {
+            Set<String> consumerIds = result.computeIfAbsent(cfg.getTopic(), k -> new HashSet<>());
+            consumerIds.add(cfg.getConsumerId());
+        }
 
-			senders.put(cfg.getTopic(), sender);
-		}
-
-		return new MessageProducer(senders);
-	}
+        return result;
+    }
 
 
-	/**
-	 * 构建消息消费者
-	 *
-	 * @return 消息消费者
-	 */
-	private Map<String, MessageConsumer> buildConsumers() {
-		if (Collections2.isEmpty(this.consumerIdQueueMap)) {
-			return new HashMap<>(0);
-		}
+    /**
+     * 构建队列
+     *
+     * @return topic 和 消费队列的映射
+     */
+    private Map<String, BeetleQueue> buildTopicConsumerQueues() {
+        if (Collections2.isEmpty(this.topicConsumerIdMap)) {
+            new HashMap<>(0);
+        }
 
-		Map<String, MessageConsumer> result = new HashMap<>(this.consumerIdQueueMap.size());
-		for (ConsumeConfig cfg : this.properties.getConsumer()) {
-			MessageRetryStrategy retryStrategy = buildRetryStrategy(cfg.getRetry());
-			ConsumeStrategy consumeStrategy = new ThreadingConsumeStrategy(cfg.getConsumeThreads());
-			String consumerId = cfg.getConsumerId();
-			BeetleQueue queue = this.consumerIdQueueMap.get(consumerId);
+        final Map<String, BeetleQueue> result = new HashMap<>(this.topicConsumerIdMap.size());
 
-			result.put(consumerId, new MessageConsumer(consumerId, queue, consumeStrategy, retryStrategy));
-			this.consumerProcessors.put(consumerId, cfg.getProcessor());
+        this.topicConsumerIdMap.forEach((topic, configs) -> {
+            BeetleQueue queue = new RedisBeetleQueue(topic, queueStrategy, redisOperator, new ArrayList<>(configs));
+            result.put(topic, queue);
+        });
 
-			Set<String> set = this.expectedProcessors.computeIfAbsent(cfg.getProcessor(), k -> new HashSet<>(4));
-			set.add(consumerId);
-		}
-
-		return result;
-	}
+        return result;
+    }
 
 
-	/**
-	 * 根据配置构建重试策略
-	 *
-	 * @param config 重试配置
-	 * @return 重试策略
-	 */
-	private MessageRetryStrategy buildRetryStrategy(ConsumeConfig.ConsumeRetryConfig config) {
-		if (config.getType() == RetryStrategyType.NO) {
-			return NoRetryStrategy.getInstance();
-		}
+    /**
+     * 构建消费ID和队列的映射关系
+     *
+     * @return 消费ID和队列的映射关系
+     */
+    private Map<String, BeetleQueue> mapConsumeQueue() {
+        if (Collections2.isEmpty(this.topicConsumerQueueMap)
+                || Collections2.isEmpty(this.topicConsumerIdMap)) {
+            return new HashMap<>(0);
+        }
 
-		assert config.getMax() > 0;
+        Map<String, BeetleQueue> result = new HashMap<>(this.topicConsumerIdMap.size());
 
-		return new MaxRetryStrategy(config.getMax());
-	}
+        this.topicConsumerQueueMap.forEach((topic, queue) -> {
+            Set<String> consumerIds = this.topicConsumerIdMap.get(topic);
+            assert null != consumerIds && !consumerIds.isEmpty();
 
+            consumerIds.forEach(e -> result.put(e, queue));
+        });
 
-	public MessageProducer getProducer() {
-		return producer;
-	}
-
-	@Override
-	public void destroy() throws Exception {
-		consumers.values().forEach(MessageConsumer::stop);
-	}
-
-	@Override
-	public void afterSingletonsInstantiated() {
-		consumers.values().forEach(MessageConsumer::start);
-	}
+        return result;
+    }
 
 
-	private void addProcessor(String beanName, MessageProcessor processor) {
-		if (this.expectedProcessors.containsKey(beanName)) {
-			this.processors.put(consumerId, processor.getClass().getName());
-		}
-	}
+    /**
+     * 构建消息生产者
+     *
+     * @return 消息生产者
+     * @throws Exception 异常信息
+     */
+    private MessageProducer buildProducer() throws Exception {
+        if (Collections2.isEmpty(this.properties.getProducer())) {
+            return null;
+        }
 
-	/**
-	 * 此处会在bean注入完成后，判断这个bean是否是需要的Processor实例
-	 *
-	 * @param bean     注入完成的bean
-	 * @param beanName bean名称
-	 * @return bean实例
-	 * @throws BeansException 出错时会抛出
-	 */
-	@Override
-	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-		if (bean instanceof MessageProcessor) {
-			addProcessor(beanName, (MessageProcessor) bean);
-		}
-		return bean;
-	}
+        Map<String, Sender> senders = new HashMap<>(this.properties.getProducer().size());
 
-	@Override
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        for (ProduceConfig cfg : this.properties.getProducer()) {
+            Serializer serializer = cfg.getSerializer().newInstance();
+            BeetleQueue queue = topicProducerQueueMap.get(cfg.getTopic());
+            MessageSender sender = new MessageSender(queue, serializer, cfg);
 
-	}
+            senders.put(cfg.getTopic(), sender);
+        }
+
+        return new MessageProducer(senders);
+    }
+
+
+    /**
+     * 构建消息消费者
+     *
+     * @return 消息消费者
+     */
+    private Map<String, MessageConsumer> buildConsumers() {
+        if (Collections2.isEmpty(this.consumerIdQueueMap)) {
+            return new HashMap<>(0);
+        }
+
+        Map<String, MessageConsumer> result = new HashMap<>(this.consumerIdQueueMap.size());
+        for (ConsumeConfig cfg : this.properties.getConsumer()) {
+            MessageRetryStrategy retryStrategy = buildRetryStrategy(cfg.getRetry());
+            ConsumeStrategy consumeStrategy = new ThreadingConsumeStrategy(cfg.getConsumeThreads());
+            String consumerId = cfg.getConsumerId();
+            if (isBlank(consumerId)) {
+                throw new RedisQConfigException("consumer id is empty!");
+            }
+
+            BeetleQueue queue = this.consumerIdQueueMap.get(consumerId);
+
+            result.put(consumerId, new MessageConsumer(consumerId, queue, consumeStrategy, retryStrategy));
+            if (isBlank(cfg.getProcessor())) {
+                throw new RedisQConfigException("processor is empty for consumer: " + consumerId);
+            }
+
+            Set<String> set = this.expectedProcessors.computeIfAbsent(cfg.getProcessor(), k -> new HashSet<>(4));
+            set.add(consumerId);
+        }
+
+        return result;
+    }
+
+
+    /**
+     * 根据配置构建重试策略
+     *
+     * @param config 重试配置
+     * @return 重试策略
+     */
+    private MessageRetryStrategy buildRetryStrategy(ConsumeConfig.ConsumeRetryConfig config) {
+        if (config.getType() == RetryStrategyType.NO) {
+            return NoRetryStrategy.getInstance();
+        }
+
+        assert config.getMax() > 0;
+
+        return new MaxRetryStrategy(config.getMax());
+    }
+
+
+    public MessageProducer getProducer() {
+        return producer;
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        destroySignal.set(true);
+        consumers.values().forEach(MessageConsumer::stop);
+    }
+
+    @Override
+    public void afterSingletonsInstantiated() {
+        while(!startConsumerSignal.get()){
+
+
+            try {
+                TimeUnit.MICROSECONDS.sleep(100L);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        consumers.values().forEach(MessageConsumer::start);
+    }
+
+
+    private void addProcessor(String beanName, MessageProcessor processor) {
+        if (this.expectedProcessors.containsKey(beanName)) {
+            this.addProcessor0(beanName, processor);
+        } else if (this.expectedProcessors.containsKey(processor.getClass().getName())) {
+            this.addProcessor0(processor.getClass().getName(), processor);
+        }
+
+        if (expectedProcessors.isEmpty()) {
+            this.startConsumerSignal.set(true);
+        }
+    }
+
+
+    private void addProcessor0(String beanName, MessageProcessor processor) {
+        Set<String> consumerIds = this.expectedProcessors.remove(beanName);
+        if (Collections2.isEmpty(consumerIds)) {
+            return;
+        }
+        for (String consumerId : consumerIds) {
+            MessageConsumer consumer = consumers.get(consumerId);
+            if (null != consumer) {
+                consumer.setProcessor(processor);
+                startupLatch.countDown();
+            }
+        }
+    }
+
+    /**
+     * 此处会在bean注入完成后，判断这个bean是否是需要的Processor实例
+     *
+     * @param bean     注入完成的bean
+     * @param beanName bean名称
+     * @return bean实例
+     * @throws BeansException 出错时会抛出
+     */
+    @Override
+    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+        if (bean instanceof MessageProcessor) {
+            addProcessor(beanName, (MessageProcessor) bean);
+        }
+        return bean;
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+
+    }
 }
