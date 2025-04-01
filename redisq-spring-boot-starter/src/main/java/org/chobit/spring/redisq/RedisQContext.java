@@ -27,7 +27,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * RedisQ启动器
@@ -54,7 +54,10 @@ public class RedisQContext
 
 	private final MessageProducer producer;
 	private final Map<String, MessageConsumer> consumers;
-	private final Map<String, String> processors;
+	private final Map<String, String> consumerProcessors;
+	private final Map<String, Set<String>> expectedProcessors = new HashMap<>(4);
+
+	private final CountDownLatch startupLatch;
 
 
 	public RedisQContext(BeetleProperties properties,
@@ -71,8 +74,11 @@ public class RedisQContext
 		this.topicConsumerIdMap = buildTopicConsumerIdMap();
 		this.topicConsumerQueueMap = buildTopicConsumerQueues();
 		this.consumerIdQueueMap = mapConsumeQueue();
-		this.processors = new HashMap<>(4);
+		this.consumerProcessors = new HashMap<>(4);
 		this.consumers = buildConsumers();
+
+		int totalConsumers = properties.totalConsumers();
+		this.startupLatch = new CountDownLatch(totalConsumers);
 	}
 
 
@@ -203,7 +209,10 @@ public class RedisQContext
 			BeetleQueue queue = this.consumerIdQueueMap.get(consumerId);
 
 			result.put(consumerId, new MessageConsumer(consumerId, queue, consumeStrategy, retryStrategy));
-			this.processors.put(consumerId, cfg.getProcessor());
+			this.consumerProcessors.put(consumerId, cfg.getProcessor());
+
+			Set<String> set = this.expectedProcessors.computeIfAbsent(cfg.getProcessor(), k -> new HashSet<>(4));
+			set.add(consumerId);
 		}
 
 		return result;
@@ -242,6 +251,12 @@ public class RedisQContext
 	}
 
 
+	private void addProcessor(String beanName, MessageProcessor processor) {
+		if (this.expectedProcessors.containsKey(beanName)) {
+			this.processors.put(consumerId, processor.getClass().getName());
+		}
+	}
+
 	/**
 	 * 此处会在bean注入完成后，判断这个bean是否是需要的Processor实例
 	 *
@@ -253,7 +268,7 @@ public class RedisQContext
 	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 		if (bean instanceof MessageProcessor) {
-			addProcessor(beanName, bean);
+			addProcessor(beanName, (MessageProcessor) bean);
 		}
 		return bean;
 	}
