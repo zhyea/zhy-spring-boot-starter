@@ -26,14 +26,14 @@ public class MaxRetryStrategy implements MessageRetryStrategy {
 
 	@Override
 	public void retry(Message message, BeetleQueue queue, String consumerId) {
-		int currentRetryCount = message.getRetryCount();
+		int currentRetryCount = message.getLeftRetryCount();
 		if (currentRetryCount >= (this.maxRetryCount - 1)) {
 			logger.debug("Max retries {} reached for message with ID [{}] on queue [{}]",
 					this.maxRetryCount, message.getId(), queue.topic());
 			return;
 		}
 
-		message.setRetryCount(++currentRetryCount);
+		message.setLeftRetryCount(++currentRetryCount);
 		queue.enqueue(message);
 	}
 }

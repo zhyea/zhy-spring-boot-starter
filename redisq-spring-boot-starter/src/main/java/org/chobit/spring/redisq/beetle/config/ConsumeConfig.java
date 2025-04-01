@@ -39,7 +39,7 @@ public class ConsumeConfig {
     /**
      * 消费重试配置
      */
-    private ConsumeRetryConfig retry;
+    private RetryStrategyType retry;
 
 
     public String getTopic() {
@@ -82,46 +82,11 @@ public class ConsumeConfig {
         this.processor = processor;
     }
 
-    public ConsumeRetryConfig getRetry() {
+    public RetryStrategyType getRetry() {
         return retry;
     }
 
-    public void setRetry(ConsumeRetryConfig retry) {
+    public void setRetry(RetryStrategyType retry) {
         this.retry = retry;
     }
-
-    /**
-     * 消费重试配置
-     */
-    public static class ConsumeRetryConfig {
-
-        /**
-         * 重试策略
-         */
-        private RetryStrategyType type;
-
-        /**
-         * 最大重试次数
-         */
-        private Integer max = 3;
-
-
-        public Integer getMax() {
-            return max;
-        }
-
-        public void setMax(Integer max) {
-            this.max = max;
-        }
-
-        public RetryStrategyType getType() {
-            return type;
-        }
-
-        public void setType(RetryStrategyType type) {
-            this.type = type;
-        }
-    }
-
-
 }

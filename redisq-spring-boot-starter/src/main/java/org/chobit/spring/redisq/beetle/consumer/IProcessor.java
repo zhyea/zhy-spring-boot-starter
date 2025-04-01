@@ -8,7 +8,7 @@ import org.chobit.spring.redisq.beetle.Message;
  * @author robin
  * @since 2025/3/29 9:30
  */
-public interface MessageProcessor {
+public interface IProcessor {
 
 
 	/**

@@ -17,24 +17,20 @@ public class Message {
 
 	private Long offset;
 
-
 	/**
 	 * 消息创建时间
 	 */
 	private long createTime;
-
 
 	/**
 	 * 消息剩余有效时间，单位秒
 	 */
 	private Long ttlSeconds;
 
-
 	/**
 	 * 消息消费重试次数
 	 */
-	private int retryCount;
-
+	private int leftRetryCount;
 
 	/**
 	 * 消息体
@@ -66,12 +62,20 @@ public class Message {
 		this.ttlSeconds = ttlSeconds;
 	}
 
-	public int getRetryCount() {
-		return retryCount;
+	public int getLeftRetryCount() {
+		return leftRetryCount;
 	}
 
-	public void setRetryCount(int retryCount) {
-		this.retryCount = retryCount;
+	public void setLeftRetryCount(int leftRetryCount) {
+		this.leftRetryCount = leftRetryCount;
+	}
+
+	public Long getOffset() {
+		return offset;
+	}
+
+	public void setOffset(Long offset) {
+		this.offset = offset;
 	}
 
 	public String getBody() {

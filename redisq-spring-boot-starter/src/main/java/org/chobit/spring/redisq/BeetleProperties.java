@@ -23,10 +23,14 @@ public class BeetleProperties {
 	private Long dequeueTimeout = TimeUnit.SECONDS.toMillis(30);
 
 	/**
+	 * 最大重试次数
+	 */
+	private Integer maxRetryCount = 3;
+
+	/**
 	 * 消费者配置
 	 */
 	private List<ConsumeConfig> consumer;
-
 
 	/**
 	 * 生产者配置
@@ -40,6 +44,14 @@ public class BeetleProperties {
 
 	public void setDequeueTimeout(Long dequeueTimeout) {
 		this.dequeueTimeout = dequeueTimeout;
+	}
+
+	public Integer getMaxRetryCount() {
+		return maxRetryCount;
+	}
+
+	public void setMaxRetryCount(Integer maxRetryCount) {
+		this.maxRetryCount = maxRetryCount;
 	}
 
 	public List<ConsumeConfig> getConsumer() {

@@ -27,7 +27,7 @@ public class MessageConsumer {
 	private final ConsumeStrategy consumeStrategy;
 	private final MessageRetryStrategy retryStrategy;
 
-	private MessageProcessor processor;
+	private IProcessor processor;
 
 
 	public MessageConsumer(String consumerId,
@@ -76,7 +76,7 @@ public class MessageConsumer {
 	}
 
 
-	public void setProcessor(MessageProcessor processor) {
+	public void setProcessor(IProcessor processor) {
 		this.processor = processor;
 	}
 }
