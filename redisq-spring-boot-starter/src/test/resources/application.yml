@@ -8,12 +8,8 @@ redisq:
     - topic: topic1
       consume-timeout: 1000
       consume-threads: 3
-      retry:
-        type: multi
-        max: 3
+      retry: multi
       processor: zhyyy
   producer:
     - topic: topic1
-      ttlSeconds: 60
-      serializer: org.chobit.spring.redisq.beetle.serialization.JacksonSerializer
 

@@ -12,6 +12,6 @@ import org.chobit.spring.redisq.beetle.Message;
 public interface MessageRetryStrategy {
 
 
-	void retry(Message message, BeetleQueue queue, String consumerId);
+	void retry(Message message, BeetleQueue queue, String consumerId, Throwable t);
 
 }

@@ -12,7 +12,7 @@ import org.chobit.spring.redisq.beetle.Message;
 public class NoRetryStrategy implements MessageRetryStrategy {
 
 	@Override
-	public void retry(Message message, BeetleQueue queue, String consumerId) {
+	public void retry(Message message, BeetleQueue queue, String consumerId, Throwable t) {
 		// no-op
 	}
 

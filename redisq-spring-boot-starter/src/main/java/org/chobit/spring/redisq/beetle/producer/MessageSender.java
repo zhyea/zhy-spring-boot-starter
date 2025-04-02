@@ -3,7 +3,6 @@ package org.chobit.spring.redisq.beetle.producer;
 import org.chobit.spring.redisq.beetle.BeetleException;
 import org.chobit.spring.redisq.beetle.BeetleQueue;
 import org.chobit.spring.redisq.beetle.Message;
-import org.chobit.spring.redisq.beetle.config.ProduceConfig;
 import org.chobit.spring.redisq.beetle.serialization.Serializer;
 
 import static java.lang.String.format;
@@ -18,20 +17,20 @@ public class MessageSender implements Sender {
 
 	private final BeetleQueue queue;
 	private final Serializer serializer;
-	private final ProduceConfig produceConfig;
+	private final Long ttlSeconds;
 	private final Integer maxRetryCount;
 
 
 	public MessageSender(BeetleQueue queue,
 	                     Serializer serializer,
-	                     ProduceConfig produceConfig,
+						 Long ttlSeconds,
 	                     Integer maxRetryCount) {
 		assert null != queue;
 		assert null != serializer;
 
 		this.queue = queue;
 		this.serializer = serializer;
-		this.produceConfig = produceConfig;
+		this.ttlSeconds = ttlSeconds;
 		this.maxRetryCount = maxRetryCount;
 	}
 
@@ -45,7 +44,7 @@ public class MessageSender implements Sender {
 		String body = serializer.serialize(payload);
 		Message message = new Message();
 		message.setBody(body);
-		message.setTtlSeconds(produceConfig.getTtlSeconds());
+		message.setTtlSeconds(ttlSeconds);
 		message.setCreateTime(System.currentTimeMillis());
 
 		int maxRetry = (null == maxRetryCount ? 0 : maxRetryCount);

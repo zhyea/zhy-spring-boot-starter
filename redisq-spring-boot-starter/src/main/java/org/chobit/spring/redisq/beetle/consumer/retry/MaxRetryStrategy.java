@@ -14,28 +14,29 @@ import org.slf4j.LoggerFactory;
 public class MaxRetryStrategy implements MessageRetryStrategy {
 
 
-	private static final Logger logger = LoggerFactory.getLogger(MaxRetryStrategy.class);
+    private static final Logger logger = LoggerFactory.getLogger(MaxRetryStrategy.class);
 
 
-	private final int maxRetryCount;
+    @Override
+    public void retry(Message message, BeetleQueue queue, String consumerId, Throwable t) {
 
-	public MaxRetryStrategy(int maxRetryCount) {
-		this.maxRetryCount = maxRetryCount;
-	}
+        logger.error();
 
+        if(message.getMaxRetryCount()<=0){
+            // 消息不需要重试
+            return;
+        }
 
-	@Override
-	public void retry(Message message, BeetleQueue queue, String consumerId) {
-		int leftRetryCount = message.getLeftRetryCount();
+        int leftRetryCount = message.getLeftRetryCount();
 
-		message.setLeftRetryCount(Math.max(--leftRetryCount, 0));
-		if (leftRetryCount <= 0) {
-			logger.debug("Max retries {} reached for message with ID [{}] on queue [{}]",
-					this.maxRetryCount, message.getId(), queue.topic());
-			return;
-		}
+        if(leftRetryCount <= 0){
+            String msg = String.format("Max retries %d reached for message with ID [%s] on queue [%s]",
+                    message.getMaxRetryCount(), message.getId(), queue.topic());
+            logger.debug(msg);
+            throw new RetryableMessageException(msg);
+        }
 
-		message.setLeftRetryCount(++leftRetryCount);
-		queue.enqueue(message);
-	}
+        message.setLeftRetryCount(++leftRetryCount);
+        queue.enqueue(message);
+    }
 }

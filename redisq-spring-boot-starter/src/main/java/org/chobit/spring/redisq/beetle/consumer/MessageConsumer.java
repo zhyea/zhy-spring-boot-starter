@@ -64,7 +64,7 @@ public class MessageConsumer {
 			message = queue.dequeue(consumerId);
 			processor.process(message);
 		} catch (Throwable e) {
-			retryStrategy.retry(message, queue, consumerId);
+			retryStrategy.retry(message, queue, consumerId, e);
 		}
 	}
 

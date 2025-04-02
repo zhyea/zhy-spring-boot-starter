@@ -18,14 +18,14 @@ public class ProduceConfig {
 	private String topic;
 
 	/**
-	 * 消息缓存有效时间，单位秒
-	 */
-	Long ttlSeconds;
-
-	/**
 	 * 消息序列化器
 	 */
 	private Class<? extends Serializer> serializer = JacksonSerializer.class;
+
+	/**
+	 * 最大重试次数
+	 */
+	private Integer maxRetryCount = 3;
 
 
 	public String getTopic() {
@@ -36,19 +36,19 @@ public class ProduceConfig {
 		this.topic = topic;
 	}
 
-	public Long getTtlSeconds() {
-		return ttlSeconds;
-	}
-
-	public void setTtlSeconds(Long ttlSeconds) {
-		this.ttlSeconds = ttlSeconds;
-	}
-
 	public Class<? extends Serializer> getSerializer() {
 		return serializer;
 	}
 
 	public void setSerializer(Class<? extends Serializer> serializer) {
 		this.serializer = serializer;
+	}
+
+	public Integer getMaxRetryCount() {
+		return maxRetryCount;
+	}
+
+	public void setMaxRetryCount(Integer maxRetryCount) {
+		this.maxRetryCount = maxRetryCount;
 	}
 }
