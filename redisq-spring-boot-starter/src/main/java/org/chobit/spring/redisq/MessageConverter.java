@@ -19,7 +19,8 @@ final class MessageConverter {
 	private static final String FIELD_ID = "id";
 	private static final String FIELD_CREATE_TIME = "ct";
 	private static final String FIELD_TTL = "ttl";
-	private static final String FIELD_RETRY_COUNT = "rc";
+	private static final String FIELD_MAX_RETRY_COUNT = "mrc";
+	private static final String FIELD_LEFT_RETRY_COUNT = "lrc";
 	private static final String FIELD_PAYLOAD = "body";
 
 
@@ -34,7 +35,8 @@ final class MessageConverter {
 		Map<String, String> result = new HashMap<>(8);
 		result.put(FIELD_ID, message.getId());
 		result.put(FIELD_CREATE_TIME, Long.toString(message.getCreateTime()));
-		result.put(FIELD_RETRY_COUNT, Integer.toString(message.getLeftRetryCount()));
+		result.put(FIELD_MAX_RETRY_COUNT, Integer.toString(message.getMaxRetryCount()));
+		result.put(FIELD_LEFT_RETRY_COUNT, Integer.toString(message.getLeftRetryCount()));
 		result.put(FIELD_PAYLOAD, message.getBody());
 
 		if (null != message.getTtlSeconds()) {
@@ -59,10 +61,10 @@ final class MessageConverter {
 		Message message = new Message();
 		message.setId(data.get(FIELD_ID));
 		message.setCreateTime(Long.parseLong(data.get(FIELD_CREATE_TIME)));
-		message.setLeftRetryCount(Integer.parseInt(data.get(FIELD_RETRY_COUNT)));
+		message.setLeftRetryCount(Integer.parseInt(data.get(FIELD_MAX_RETRY_COUNT)));
 		message.setBody(data.get(FIELD_PAYLOAD));
 
-		String retryCount = data.get(FIELD_RETRY_COUNT);
+		String retryCount = data.get(FIELD_MAX_RETRY_COUNT);
 		if (isNotBlank(retryCount)) {
 			message.setLeftRetryCount(Integer.parseInt(retryCount));
 		}
