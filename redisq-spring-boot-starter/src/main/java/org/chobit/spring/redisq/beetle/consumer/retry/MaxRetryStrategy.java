@@ -14,29 +14,29 @@ import org.slf4j.LoggerFactory;
 public class MaxRetryStrategy implements MessageRetryStrategy {
 
 
-    private static final Logger logger = LoggerFactory.getLogger(MaxRetryStrategy.class);
+	private static final Logger logger = LoggerFactory.getLogger(MaxRetryStrategy.class);
 
 
-    @Override
-    public void retry(Message message, BeetleQueue queue, String consumerId, Throwable t) {
+	@Override
+	public void retry(Message message, BeetleQueue queue, String consumerId, Throwable t) {
 
-        logger.error();
+		if (message.getMaxRetryCount() <= 0) {
+			// 消息不需要重试
+			String msg = String.format("Message with id [%s] for consumer [%s] on queue [%s] is not allowed to be retried.",
+					message.getId(), consumerId, queue.topic());
+			throw new MessageRetryException(msg, t);
+		}
 
-        if(message.getMaxRetryCount()<=0){
-            // 消息不需要重试
-            return;
-        }
+		int leftRetryCount = message.getLeftRetryCount();
 
-        int leftRetryCount = message.getLeftRetryCount();
+		if (leftRetryCount <= 0) {
+			String msg = String.format("Max retries %d reached for message with id [%s] for consumer [%s] on queue [%s]",
+					message.getMaxRetryCount(), message.getId(), consumerId, queue.topic());
+			logger.debug(msg);
+			throw new MessageRetryException(msg, t);
+		}
 
-        if(leftRetryCount <= 0){
-            String msg = String.format("Max retries %d reached for message with ID [%s] on queue [%s]",
-                    message.getMaxRetryCount(), message.getId(), queue.topic());
-            logger.debug(msg);
-            throw new RetryableMessageException(msg);
-        }
-
-        message.setLeftRetryCount(++leftRetryCount);
-        queue.enqueue(message);
-    }
+		message.setLeftRetryCount(++leftRetryCount);
+		queue.enqueue(message);
+	}
 }

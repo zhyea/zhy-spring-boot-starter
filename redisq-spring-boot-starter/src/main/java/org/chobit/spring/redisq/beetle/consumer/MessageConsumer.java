@@ -64,6 +64,7 @@ public class MessageConsumer {
 			message = queue.dequeue(consumerId);
 			processor.process(message);
 		} catch (Throwable e) {
+			logger.error("Error occurred while processing message [{}]", message, e);
 			retryStrategy.retry(message, queue, consumerId, e);
 		}
 	}

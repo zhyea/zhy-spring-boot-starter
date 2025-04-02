@@ -13,7 +13,10 @@ public class NoRetryStrategy implements MessageRetryStrategy {
 
 	@Override
 	public void retry(Message message, BeetleQueue queue, String consumerId, Throwable t) {
-		// no-op
+		// 消息不需要重试
+		String msg = String.format("Message with id [%s] for consumer [%s] on queue [%s] is applied no-retry strategy.",
+				message.getId(), consumerId, queue.topic());
+		throw new MessageRetryException(msg, t);
 	}
 
 	private static final NoRetryStrategy instance = new NoRetryStrategy();

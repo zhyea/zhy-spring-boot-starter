@@ -98,4 +98,17 @@ public class Message {
 	public void setBody(String body) {
 		this.body = body;
 	}
+
+	@Override
+	public String toString() {
+		return "Message{" +
+				"id='" + id + '\'' +
+				", offset=" + offset +
+				", createTime=" + createTime +
+				", ttlSeconds=" + ttlSeconds +
+				", maxRetryCount=" + maxRetryCount +
+				", leftRetryCount=" + leftRetryCount +
+				", body='" + body + '\'' +
+				'}';
+	}
 }
