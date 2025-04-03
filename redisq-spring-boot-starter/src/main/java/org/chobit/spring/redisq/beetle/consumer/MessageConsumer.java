@@ -50,15 +50,16 @@ public class MessageConsumer {
 
 		consumeStrategy.start(topic, () -> {
 			try {
-				processNextMessage();
+				return processNextMessage();
 			} catch (Exception e) {
 				logger.error("Error occurred while consuming message.", e);
 			}
+			return null;
 		});
 	}
 
 
-	private void processNextMessage() {
+	private Message processNextMessage() {
 		Message message = null;
 		try {
 			message = queue.dequeue(consumerId);
@@ -67,6 +68,8 @@ public class MessageConsumer {
 			logger.error("Error occurred while processing message [{}]", message, e);
 			retryStrategy.retry(message, queue, consumerId, e);
 		}
+
+		return message;
 	}
 
 

@@ -1,10 +1,12 @@
 package org.chobit.spring.redisq.beetle.consumer;
 
+import org.chobit.spring.redisq.beetle.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import static java.lang.String.format;
 
@@ -33,7 +35,7 @@ public class ThreadingConsumeStrategy implements ConsumeStrategy {
 
 
 	@Override
-	public void start(String topic, Runnable callback) {
+	public void start(String topic, Callable<Message> callback) {
 		for (int i = 0; i < numThreads; i++) {
 			ConsumeThread consumeThread = new ConsumeThread(callback);
 
@@ -77,9 +79,9 @@ public class ThreadingConsumeStrategy implements ConsumeStrategy {
 	private static class ConsumeThread extends Thread {
 
 		private boolean stopRequested = false;
-		private final Runnable callback;
+		private final Callable<Message> callback;
 
-		public ConsumeThread(Runnable callback) {
+		public ConsumeThread(Callable<Message> callback) {
 			assert null != callback;
 			this.callback = callback;
 		}
@@ -88,7 +90,8 @@ public class ThreadingConsumeStrategy implements ConsumeStrategy {
 		public void run() {
 			while (!stopRequested && !isInterrupted()) {
 				try {
-					callback.run();
+					Message message = callback.call();
+					// TODO handle message
 				} catch (Throwable t) {
 					logger.error("Exception while handling next queue item.", t);
 				}
