@@ -27,15 +27,15 @@ public class RedisQAutoConfiguration {
 
 	@ConditionalOnBean(name = "redisqTemplate")
 	@Bean
-	public RedisQContext redisClient(@Qualifier("redisqTemplate") RedisTemplate<String, String> redisTemplate,
-	                                 BeetleProperties properties) throws Exception {
+	public RedisQContext redisqContext(@Qualifier("redisqTemplate") RedisTemplate<String, String> redisTemplate,
+	                                   BeetleProperties properties) throws Exception {
 		return new RedisQContext(properties, redisTemplate);
 	}
 
 
 	@ConditionalOnProperty(prefix = "redisq", name = "producer[0]", matchIfMissing = false)
 	@Bean
-	public MessageProducer queueStrategy(RedisQContext context) {
+	public MessageProducer messageProducer(RedisQContext context) {
 		return context.getProducer();
 	}
 
