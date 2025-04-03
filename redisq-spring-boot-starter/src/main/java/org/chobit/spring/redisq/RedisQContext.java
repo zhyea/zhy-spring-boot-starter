@@ -25,6 +25,12 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.core.Ordered;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.util.*;
@@ -39,7 +45,7 @@ import static org.chobit.commons.utils.StrKit.isBlank;
  * @author robin
  * @since 2025/3/30 22:16
  */
-public class RedisQContext implements SmartInitializingSingleton, DisposableBean, BeanPostProcessor {
+public class RedisQContext implements SmartInitializingSingleton, DisposableBean, BeanPostProcessor, ApplicationContextAware, Ordered {
 
 
 	private static final Logger logger = LoggerFactory.getLogger(RedisQContext.class);
@@ -62,6 +68,7 @@ public class RedisQContext implements SmartInitializingSingleton, DisposableBean
 
 	private final AtomicBoolean startConsumerSignal = new AtomicBoolean(false);
 	private final AtomicBoolean destroySignal = new AtomicBoolean(false);
+	private final AtomicBoolean refreshEventReceived = new AtomicBoolean(false);
 
 
 	public RedisQContext(BeetleProperties properties,
@@ -79,36 +86,6 @@ public class RedisQContext implements SmartInitializingSingleton, DisposableBean
 
 		this.topicProducerQueueMap = buildTopicProducerQueues();
 		this.producer = buildProducer();
-	}
-
-
-	/**
-	 * 构建topic和消息队列的映射关系
-	 *
-	 * @return topic和消息队列的映射
-	 */
-	private Map<String, BeetleQueue> buildTopicProducerQueues() {
-		List<ProduceConfig> configs = this.properties.getProducer();
-		if (Collections2.isEmpty(configs)) {
-			return new HashMap<>(0);
-		}
-
-		Map<String, BeetleQueue> result = new HashMap<>(configs.size());
-
-		for (ProduceConfig cfg : configs) {
-			String topic = cfg.getTopic();
-
-			Set<String> consumerIds = redisOperator.getRegisteredConsumerIds(topic);
-			if (Collections2.isEmpty(consumerIds)) {
-				consumerIds = new HashSet<>(8);
-			}
-			Set<String> tmp = topicConsumerIdMap.getOrDefault(topic, new HashSet<>(0));
-			consumerIds.addAll(tmp);
-
-			BeetleQueue queue = new RedisBeetleQueue(topic, queueStrategy, redisOperator, new ArrayList<>(consumerIds));
-			result.put(cfg.getTopic(), queue);
-		}
-		return result;
 	}
 
 
@@ -181,33 +158,6 @@ public class RedisQContext implements SmartInitializingSingleton, DisposableBean
 		});
 
 		return result;
-	}
-
-
-	/**
-	 * 构建消息生产者
-	 *
-	 * @return 消息生产者
-	 * @throws Exception 异常信息
-	 */
-	private MessageProducer buildProducer() throws Exception {
-		if (Collections2.isEmpty(this.properties.getProducer())) {
-			return null;
-		}
-
-		Map<String, Sender> senders = new HashMap<>(this.properties.getProducer().size());
-
-		for (ProduceConfig cfg : this.properties.getProducer()) {
-			Serializer serializer = cfg.getSerializer().newInstance();
-			BeetleQueue queue = topicProducerQueueMap.get(cfg.getTopic());
-			Integer maxRetryCount = cfg.getMaxRetry();
-			Long ttlSeconds = this.properties.getTtlSeconds();
-			MessageSender sender = new MessageSender(queue, serializer, ttlSeconds, maxRetryCount);
-
-			senders.put(cfg.getTopic(), sender);
-		}
-
-		return new MessageProducer(senders);
 	}
 
 
@@ -291,6 +241,11 @@ public class RedisQContext implements SmartInitializingSingleton, DisposableBean
 					return;
 				}
 
+				if (refreshEventReceived.get()) {
+					logger.error("Cannot find processors: {}, RedisQ consumers start failed.", expectedProcessors);
+					return;
+				}
+
 				try {
 					TimeUnit.MICROSECONDS.sleep(100L);
 				} catch (InterruptedException e) {
@@ -343,6 +298,92 @@ public class RedisQContext implements SmartInitializingSingleton, DisposableBean
 			if (null != consumer) {
 				consumer.setProcessor(processor);
 			}
+		}
+	}
+
+
+	/**
+	 * 构建topic和消息队列的映射关系
+	 *
+	 * @return topic和消息队列的映射
+	 */
+	private Map<String, BeetleQueue> buildTopicProducerQueues() {
+		List<ProduceConfig> configs = this.properties.getProducer();
+		if (Collections2.isEmpty(configs)) {
+			return new HashMap<>(0);
+		}
+
+		Map<String, BeetleQueue> result = new HashMap<>(configs.size());
+
+		for (ProduceConfig cfg : configs) {
+			String topic = cfg.getTopic();
+
+			Set<String> consumerIds = redisOperator.getRegisteredConsumerIds(topic);
+			if (Collections2.isEmpty(consumerIds)) {
+				consumerIds = new HashSet<>(8);
+			}
+			Set<String> tmp = topicConsumerIdMap.getOrDefault(topic, new HashSet<>(0));
+			consumerIds.addAll(tmp);
+
+			BeetleQueue queue = new RedisBeetleQueue(topic, queueStrategy, redisOperator, new ArrayList<>(consumerIds));
+			result.put(cfg.getTopic(), queue);
+		}
+		return result;
+	}
+
+
+	/**
+	 * 构建消息生产者
+	 *
+	 * @return 消息生产者
+	 * @throws Exception 异常信息
+	 */
+	private MessageProducer buildProducer() throws Exception {
+		if (Collections2.isEmpty(this.properties.getProducer())) {
+			return null;
+		}
+
+		Map<String, Sender> senders = new HashMap<>(this.properties.getProducer().size());
+
+		for (ProduceConfig cfg : this.properties.getProducer()) {
+			Serializer serializer = cfg.getSerializer().newInstance();
+			BeetleQueue queue = topicProducerQueueMap.get(cfg.getTopic());
+			Integer maxRetryCount = cfg.getMaxRetry();
+			Long ttlSeconds = this.properties.getTtlSeconds();
+			MessageSender sender = new MessageSender(queue, serializer, ttlSeconds, maxRetryCount);
+
+			senders.put(cfg.getTopic(), sender);
+		}
+
+		return new MessageProducer(senders);
+	}
+
+	@Override
+	public int getOrder() {
+		return LOWEST_PRECEDENCE;
+	}
+
+
+	@Override
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		if (applicationContext instanceof ConfigurableApplicationContext) {
+			((ConfigurableApplicationContext) applicationContext).addApplicationListener(new ContextRefreshListener());
+		}
+	}
+
+
+	private void onApplicationEvent(ContextRefreshedEvent event) {
+		this.refreshEventReceived.set(true);
+	}
+
+	/**
+	 * ApplicationListener endpoint that receives events from this servlet's WebApplicationContext
+	 * only, delegating to {@code onApplicationEvent} on the FrameworkServlet instance.
+	 */
+	private class ContextRefreshListener implements ApplicationListener<ContextRefreshedEvent> {
+		@Override
+		public void onApplicationEvent(ContextRefreshedEvent event) {
+			RedisQContext.this.onApplicationEvent(event);
 		}
 	}
 
