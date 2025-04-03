@@ -9,8 +9,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Role;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 /**
  * redisq 自动配置
@@ -18,26 +20,29 @@ import org.springframework.data.redis.core.RedisTemplate;
  * @author robin
  * @since 2025/3/30 16:33
  */
-@ConditionalOnClass(RedisTemplate.class)
+@ConditionalOnBean(name = "redisqConnectionFactory")
+@ConditionalOnClass(RedisConnectionFactory.class)
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(BeetleProperties.class)
 @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 public class RedisQAutoConfiguration {
 
 
-	@ConditionalOnBean(name = "redisqTemplate")
-	@Bean
-	public RedisQContext redisqContext(@Qualifier("redisqTemplate") RedisTemplate<String, String> redisTemplate,
-	                                   BeetleProperties properties) throws Exception {
-		return new RedisQContext(properties, redisTemplate);
-	}
+    @DependsOn("redisqConnectionFactory")
+    @ConditionalOnBean(name = "redisqConnectionFactory")
+    @Bean
+    public RedisQContext redisqContext(@Qualifier("redisqConnectionFactory") RedisConnectionFactory connFactory,
+                                       BeetleProperties properties) throws Exception {
+        StringRedisTemplate redisTemplate = new StringRedisTemplate(connFactory);
+        return new RedisQContext(properties, redisTemplate);
+    }
 
 
-	@ConditionalOnProperty(prefix = "redisq", name = "producer[0]", matchIfMissing = false)
-	@Bean
-	public MessageProducer messageProducer(RedisQContext context) {
-		return context.getProducer();
-	}
+    @ConditionalOnProperty(name = "redisq.producer")
+    @Bean
+    public MessageProducer messageProducer(RedisQContext context) {
+        return context.getProducer();
+    }
 
 
 }

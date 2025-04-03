@@ -12,43 +12,43 @@ import org.chobit.spring.redisq.beetle.serialization.Serializer;
 public class ProduceConfig {
 
 
-	/**
-	 * 要写入的topic
-	 */
-	private String topic;
+    /**
+     * 要写入的topic
+     */
+    private String topic;
 
-	/**
-	 * 消息序列化器
-	 */
-	private Class<? extends Serializer> serializer = JacksonSerializer.class;
+    /**
+     * 消息序列化器
+     */
+    private Class<? extends Serializer> serializer = JacksonSerializer.class;
 
-	/**
-	 * 最大重试次数
-	 */
-	private Integer maxRetryCount = 3;
+    /**
+     * 最大重试次数
+     */
+    private Integer maxRetry = 3;
 
 
-	public String getTopic() {
-		return topic;
-	}
+    public String getTopic() {
+        return topic;
+    }
 
-	public void setTopic(String topic) {
-		this.topic = topic;
-	}
+    public void setTopic(String topic) {
+        this.topic = topic;
+    }
 
-	public Class<? extends Serializer> getSerializer() {
-		return serializer;
-	}
+    public Class<? extends Serializer> getSerializer() {
+        return serializer;
+    }
 
-	public void setSerializer(Class<? extends Serializer> serializer) {
-		this.serializer = serializer;
-	}
+    public void setSerializer(Class<? extends Serializer> serializer) {
+        this.serializer = serializer;
+    }
 
-	public Integer getMaxRetryCount() {
-		return maxRetryCount;
-	}
+    public Integer getMaxRetry() {
+        return maxRetry;
+    }
 
-	public void setMaxRetryCount(Integer maxRetryCount) {
-		this.maxRetryCount = maxRetryCount;
-	}
+    public void setMaxRetry(Integer maxRetry) {
+        this.maxRetry = maxRetry;
+    }
 }

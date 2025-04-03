@@ -1,7 +1,7 @@
 package org.chobit.spring.redisq;
 
 import org.springframework.data.redis.core.HashOperations;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.util.Map;
 import java.util.Set;
@@ -16,10 +16,10 @@ import java.util.concurrent.TimeUnit;
 public class RedisClientImpl implements RedisClient {
 
 
-	private final RedisTemplate<String, String> redisTemplate;
+	private final StringRedisTemplate redisTemplate;
 
 
-	public RedisClientImpl(RedisTemplate<String, String> redisTemplate) {
+	public RedisClientImpl(StringRedisTemplate redisTemplate) {
 		this.redisTemplate = redisTemplate;
 	}
 

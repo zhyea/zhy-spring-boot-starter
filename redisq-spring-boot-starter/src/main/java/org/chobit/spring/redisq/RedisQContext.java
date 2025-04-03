@@ -25,7 +25,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -65,7 +65,7 @@ public class RedisQContext implements SmartInitializingSingleton, DisposableBean
 
 
 	public RedisQContext(BeetleProperties properties,
-	                     RedisTemplate<String, String> redisTemplate) throws Exception {
+	                     StringRedisTemplate redisTemplate) throws Exception {
 		this.properties = properties;
 
 		RedisClient redisClient = new RedisClientImpl(redisTemplate);
@@ -200,7 +200,7 @@ public class RedisQContext implements SmartInitializingSingleton, DisposableBean
 		for (ProduceConfig cfg : this.properties.getProducer()) {
 			Serializer serializer = cfg.getSerializer().newInstance();
 			BeetleQueue queue = topicProducerQueueMap.get(cfg.getTopic());
-			Integer maxRetryCount = cfg.getMaxRetryCount();
+			Integer maxRetryCount = cfg.getMaxRetry();
 			Long ttlSeconds = this.properties.getTtlSeconds();
 			MessageSender sender = new MessageSender(queue, serializer, ttlSeconds, maxRetryCount);
 

@@ -1,0 +1,24 @@
+{
+  "hints": [],
+  "groups": [
+    {
+      "sourceType": "org.chobit.spring.redisq.BeetleProperties",
+      "name": "redisq",
+      "type": "org.chobit.spring.redisq.BeetleProperties"
+    }
+  ],
+  "properties": [
+    {
+      "sourceType": "org.chobit.spring.redisq.BeetleProperties",
+      "name": "redisq.consumer",
+      "description": "RedisQ consumer config.",
+      "type": "java.util.List<org.chobit.spring.redisq.beetle.config.ConsumeConfig>"
+    },
+    {
+      "sourceType": "org.chobit.spring.redisq.BeetleProperties",
+      "name": "redisq.producer",
+      "description": "RedisQ producer config.",
+      "type": "java.util.List<org.chobit.spring.redisq.beetle.config.ProduceConfig>"
+    }
+  ]
+}

@@ -18,17 +18,7 @@
       "sourceType": "org.chobit.spring.redisq.BeetleProperties",
       "name": "redisq.producer",
       "description": "RedisQ producer config.",
-      "type": "org.chobit.spring.redisq.beetle.config.ProduceConfig"
-    },
-    {
-      "name": "redisq.producer.ttlSeconds",
-      "description": "RedisQ message default cache time.",
-      "type": "java.lang.Long"
-    },
-    {
-      "name": "redisq.producer.serializer",
-      "description": "RedisQ message default serializer.",
-      "type": "java.lang.Class"
+      "type": "java.util.List<org.chobit.spring.redisq.beetle.config.ProduceConfig>"
     }
   ]
 }
