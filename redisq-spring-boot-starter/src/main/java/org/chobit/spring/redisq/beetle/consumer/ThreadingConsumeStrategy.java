@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static java.lang.String.format;
 
@@ -18,85 +20,93 @@ import static java.lang.String.format;
  */
 public class ThreadingConsumeStrategy implements ConsumeStrategy {
 
-	private static final Logger logger = LoggerFactory.getLogger(ThreadingConsumeStrategy.class);
+    private static final Logger logger = LoggerFactory.getLogger(ThreadingConsumeStrategy.class);
 
 
-	private static final long MAX_WAIT_MILLIS_WHEN_STOPPING_THREADS = 30 * 1000;
+    private static final long MAX_WAIT_MILLIS_WHEN_STOPPING_THREADS = TimeUnit.SECONDS.toMillis(30);
 
 
-	private final int numThreads;
-	private final List<ConsumeThread> consumeThreads;
+    private final int numThreads;
+    private final List<ConsumeThread> consumeThreads;
 
 
-	public ThreadingConsumeStrategy(int numThreads) {
-		this.numThreads = numThreads;
-		this.consumeThreads = new ArrayList<>(numThreads);
-	}
+    public ThreadingConsumeStrategy(int numThreads) {
+        this.numThreads = numThreads;
+        this.consumeThreads = new ArrayList<>(numThreads);
+    }
 
 
-	@Override
-	public void start(String topic, Callable<Message> callback) {
-		for (int i = 0; i < numThreads; i++) {
-			ConsumeThread consumeThread = new ConsumeThread(callback);
+    @Override
+    public void start(String topic, Callable<Message> callback) {
+        for (int i = 0; i < numThreads; i++) {
+            ConsumeThread consumeThread = new ConsumeThread(callback);
 
-			consumeThread.setName(format("beetle-consumer[%s]-%s", topic, i));
-			consumeThread.start();
+            consumeThread.setName(format("beetle-consumer[%s]-%s", topic, i));
+            consumeThread.start();
 
-			consumeThreads.add(consumeThread);
-			logger.debug("Started message consumer thread [{}]", consumeThread.getName());
-		}
-	}
-
-
-	@Override
-	public void stop() {
-		try {
-			for (ConsumeThread thread : this.consumeThreads) {
-				logger.debug("Stopping message consuming thread [{}]", thread.getName());
-				thread.stopRequested = true;
-			}
-			this.waitForAllThreadsToTerminate();
-		} finally {
-			consumeThreads.clear();
-		}
-	}
+            consumeThreads.add(consumeThread);
+            logger.debug("Started message consumer thread [{}]", consumeThread.getName());
+        }
+    }
 
 
-	private void waitForAllThreadsToTerminate() {
-		for (ConsumeThread thread : this.consumeThreads) {
-			try {
-				thread.join(MAX_WAIT_MILLIS_WHEN_STOPPING_THREADS);
-			} catch (InterruptedException e) {
-				logger.warn("Unable to join thread [{}].", thread.getName(), e);
-			}
-		}
-	}
+    @Override
+    public void stop() {
+        try {
+            for (ConsumeThread thread : this.consumeThreads) {
+                logger.debug("Stopping message consuming thread [{}]", thread.getName());
+                thread.stopRequested = true;
+            }
+            this.waitForAllThreadsToTerminate();
+        } finally {
+            consumeThreads.clear();
+        }
+    }
 
 
-	/**
-	 * 消费线程定义
-	 */
-	private static class ConsumeThread extends Thread {
+    private void waitForAllThreadsToTerminate() {
+        for (ConsumeThread thread : this.consumeThreads) {
+            try {
+                thread.join(MAX_WAIT_MILLIS_WHEN_STOPPING_THREADS);
+            } catch (InterruptedException e) {
+                logger.warn("Unable to join thread [{}].", thread.getName(), e);
+            }
+        }
+    }
 
-		private boolean stopRequested = false;
-		private final Callable<Message> callback;
 
-		public ConsumeThread(Callable<Message> callback) {
-			assert null != callback;
-			this.callback = callback;
-		}
+    /**
+     * 消费线程定义
+     */
+    private static class ConsumeThread extends Thread {
 
-		@Override
-		public void run() {
-			while (!stopRequested && !isInterrupted()) {
-				try {
-					Message message = callback.call();
-					// TODO handle message
-				} catch (Throwable t) {
-					logger.error("Exception while handling next queue item.", t);
-				}
-			}
-		}
-	}
-	// ----------------------
+        private boolean stopRequested = false;
+        private final Callable<Message> callback;
+
+        public ConsumeThread(Callable<Message> callback) {
+            assert null != callback;
+            this.callback = callback;
+        }
+
+        @Override
+        public void run() {
+            AtomicLong counter = new AtomicLong(0);
+            while (!stopRequested && !isInterrupted()) {
+                try {
+                    Message message = callback.call();
+                    if (null == message) {
+                        long failedCount = counter.incrementAndGet();
+                        long tmp = Math.min(10L, failedCount);
+                        TimeUnit.MICROSECONDS.sleep(100L * tmp);
+                    } else {
+                        counter.set(0);
+                    }
+                } catch (Throwable t) {
+                    logger.error("Exception while handling next queue item.", t);
+                }
+            }
+            logger.info("Message consumer thread [{}] stopped.", getName());
+        }
+    }
+    // ----------------------
 }
