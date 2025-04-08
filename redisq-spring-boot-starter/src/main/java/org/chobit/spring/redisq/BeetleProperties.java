@@ -18,11 +18,6 @@ import java.util.concurrent.TimeUnit;
 public class BeetleProperties {
 
 	/**
-	 * 消息出队超时时间，单位毫秒
-	 */
-	private Long dequeueTimeout = TimeUnit.SECONDS.toMillis(30);
-
-	/**
 	 * 消息缓存时长
 	 */
 	private Long ttlSeconds = TimeUnit.DAYS.toSeconds(1);
@@ -37,14 +32,6 @@ public class BeetleProperties {
 	 */
 	private List<ProduceConfig> producer;
 
-
-	public Long getDequeueTimeout() {
-		return dequeueTimeout;
-	}
-
-	public void setDequeueTimeout(Long dequeueTimeout) {
-		this.dequeueTimeout = dequeueTimeout;
-	}
 
 	public Long getTtlSeconds() {
 		return ttlSeconds;

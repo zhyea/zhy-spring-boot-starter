@@ -4,8 +4,10 @@ import org.chobit.spring.redisq.beetle.BeetleQueue;
 import org.chobit.spring.redisq.beetle.Message;
 import org.chobit.spring.redisq.beetle.persistence.Operator;
 import org.chobit.spring.redisq.beetle.queue.QueueStrategy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.QueryTimeoutException;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.Set;
 
@@ -19,14 +21,13 @@ import static org.chobit.commons.utils.StrKit.isNotBlank;
  */
 public class RedisBeetleQueue implements BeetleQueue {
 
+	private static final Logger logger = LoggerFactory.getLogger(RedisBeetleQueue.class);
 
 	private final String topic;
 	private final QueueStrategy queueStrategy;
 	private final Operator operator;
-	private final List<String> consumerIds;
 
-
-	public RedisBeetleQueue(String topic,
+    public RedisBeetleQueue(String topic,
 	                        QueueStrategy queueStrategy,
 	                        Operator operator,
 	                        List<String> consumerIds) {
@@ -39,19 +40,14 @@ public class RedisBeetleQueue implements BeetleQueue {
 		this.topic = topic;
 		this.queueStrategy = queueStrategy;
 		this.operator = operator;
-		this.consumerIds = consumerIds;
+
+        operator.ensureRegisterConsumerIds(topic, consumerIds);
 	}
 
 
 	@Override
 	public String topic() {
 		return topic;
-	}
-
-
-	@PostConstruct
-	public void initialize() {
-		operator.registerConsumerId(topic, consumerIds);
 	}
 
 
@@ -69,6 +65,14 @@ public class RedisBeetleQueue implements BeetleQueue {
 
 	@Override
 	public Message dequeue(String consumerId) {
-		return queueStrategy.dequeueNext(topic, consumerId);
+		try{
+			return queueStrategy.dequeueNext(topic, consumerId);
+		}catch (QueryTimeoutException e){
+			logger.debug("Query redis timeout while dequeueing message from queue [{}({})]", topic, consumerId, e);
+			return null;
+		}catch (Exception e){
+			logger.error("Error occurred while dequeueing message from queue [{}({})]", topic, consumerId, e);
+			return null;
+ 		}
 	}
 }

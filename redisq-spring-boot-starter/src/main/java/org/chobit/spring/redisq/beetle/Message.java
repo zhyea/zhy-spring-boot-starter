@@ -9,106 +9,117 @@ package org.chobit.spring.redisq.beetle;
 public class Message {
 
 
-	/**
-	 * 消息ID
-	 */
-	private String id;
+    /**
+     * 消息ID
+     */
+    private String id;
 
 
-	private Long offset;
+    private Long offset;
 
-	/**
-	 * 消息创建时间
-	 */
-	private long createTime;
+    /**
+     * 消息创建时间
+     */
+    private long createTime;
 
-	/**
-	 * 消息剩余有效时间，单位秒
-	 */
-	private Long ttlSeconds;
+    /**
+     * 消息剩余有效时间，单位秒
+     */
+    private Long ttlSeconds;
 
-	/**
-	 * 消息消费重试次数
-	 */
-	private int maxRetryCount;
+    /**
+     * 消息消费重试次数
+     */
+    private int maxRetryCount;
 
-	/**
-	 * 消息消费重试次数
-	 */
-	private int leftRetryCount;
-
-	/**
-	 * 消息体
-	 */
-	private String body;
+    /**
+     * 消息消费重试次数
+     */
+    private int leftRetryCount;
 
 
-	public String getId() {
-		return id;
-	}
+    private int retryCount;
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    /**
+     * 消息体
+     */
+    private String body;
 
-	public long getCreateTime() {
-		return createTime;
-	}
 
-	public void setCreateTime(long createTime) {
-		this.createTime = createTime;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public Long getTtlSeconds() {
-		return ttlSeconds;
-	}
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	public void setTtlSeconds(Long ttlSeconds) {
-		this.ttlSeconds = ttlSeconds;
-	}
+    public long getCreateTime() {
+        return createTime;
+    }
 
-	public int getMaxRetryCount() {
-		return maxRetryCount;
-	}
+    public void setCreateTime(long createTime) {
+        this.createTime = createTime;
+    }
 
-	public void setMaxRetryCount(int maxRetryCount) {
-		this.maxRetryCount = maxRetryCount;
-	}
+    public Long getTtlSeconds() {
+        return ttlSeconds;
+    }
 
-	public int getLeftRetryCount() {
-		return leftRetryCount;
-	}
+    public void setTtlSeconds(Long ttlSeconds) {
+        this.ttlSeconds = ttlSeconds;
+    }
 
-	public void setLeftRetryCount(int leftRetryCount) {
-		this.leftRetryCount = leftRetryCount;
-	}
+    public int getMaxRetryCount() {
+        return maxRetryCount;
+    }
 
-	public Long getOffset() {
-		return offset;
-	}
+    public void setMaxRetryCount(int maxRetryCount) {
+        this.maxRetryCount = maxRetryCount;
+    }
 
-	public void setOffset(Long offset) {
-		this.offset = offset;
-	}
+    public int getLeftRetryCount() {
+        return leftRetryCount;
+    }
 
-	public String getBody() {
-		return body;
-	}
+    public void setLeftRetryCount(int leftRetryCount) {
+        this.leftRetryCount = leftRetryCount;
+    }
 
-	public void setBody(String body) {
-		this.body = body;
-	}
+    public int getRetryCount() {
+        return retryCount;
+    }
 
-	@Override
-	public String toString() {
-		return "Message{" +
-				"id='" + id + '\'' +
-				", offset=" + offset +
-				", createTime=" + createTime +
-				", ttlSeconds=" + ttlSeconds +
-				", maxRetryCount=" + maxRetryCount +
-				", leftRetryCount=" + leftRetryCount +
-				", body='" + body + '\'' +
-				'}';
-	}
+    public void setRetryCount(int retryCount) {
+        this.retryCount = retryCount;
+    }
+
+    public Long getOffset() {
+        return offset;
+    }
+
+    public void setOffset(Long offset) {
+        this.offset = offset;
+    }
+
+    public String getBody() {
+        return body;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
+    }
+
+    @Override
+    public String toString() {
+        return "Message{" +
+                "id='" + id + '\'' +
+                ", offset=" + offset +
+                ", createTime=" + createTime +
+                ", ttlSeconds=" + ttlSeconds +
+                ", maxRetryCount=" + maxRetryCount +
+                ", leftRetryCount=" + leftRetryCount +
+                ", body='" + body + '\'' +
+                '}';
+    }
 }

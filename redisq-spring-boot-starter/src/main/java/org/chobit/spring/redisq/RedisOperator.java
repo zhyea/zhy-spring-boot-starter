@@ -30,7 +30,7 @@ public class RedisOperator implements Operator {
 
 
 	@Override
-	public void registerConsumerId(String topic, List<String> consumerIds) {
+	public void ensureRegisterConsumerIds(String topic, List<String> consumerIds) {
 		String key = keyForRegisteredConsumerIds(topic);
 		String[] consumers = consumerIds.toArray(new String[0]);
 
@@ -82,10 +82,10 @@ public class RedisOperator implements Operator {
 
 
 	@Override
-	public String dequeueMessageFromHead(String topic, String consumerId, long timeoutSeconds) {
+	public String dequeueMessageFromHead(String topic, String consumerId, long timeoutMillis) {
 		String key = keyForQueueConsumer(topic, consumerId);
 
-		return redisClient.leftPop(key, timeoutSeconds);
+		return redisClient.leftPop(key, timeoutMillis);
 	}
 
 

@@ -74,7 +74,7 @@ public class RedisQContext implements SmartInitializingSingleton, DisposableBean
 
         RedisClient redisClient = new RedisClientImpl(redisTemplate);
         this.redisOperator = new RedisOperator(redisClient);
-        this.queueStrategy = new DefaultQueueStrategy(redisOperator, properties.getDequeueTimeout());
+        this.queueStrategy = new DefaultQueueStrategy(redisOperator);
 
         this.topicConsumerIdMap = buildTopicConsumerIdMap();
         this.topicConsumerQueueMap = buildTopicConsumerQueues();

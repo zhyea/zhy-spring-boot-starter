@@ -16,60 +16,63 @@ import static org.chobit.commons.utils.StrKit.isNotBlank;
 final class MessageConverter {
 
 
-	private static final String FIELD_ID = "id";
-	private static final String FIELD_CREATE_TIME = "ct";
-	private static final String FIELD_TTL = "ttl";
-	private static final String FIELD_MAX_RETRY_COUNT = "mrc";
-	private static final String FIELD_LEFT_RETRY_COUNT = "lrc";
-	private static final String FIELD_PAYLOAD = "body";
+    private static final String FIELD_ID = "id";
+    private static final String FIELD_CREATE_TIME = "ct";
+    private static final String FIELD_TTL = "ttl";
+    private static final String FIELD_MAX_RETRY_COUNT = "mrc";
+    private static final String FIELD_LEFT_RETRY_COUNT = "lrc";
+    private static final String FIELD_PAYLOAD = "body";
 
 
-	/**
-	 * 将消息转换为Map, 用于存储到Redis中
-	 *
-	 * @param message 消息
-	 * @return Map
-	 */
-	static Map<String, String> toMap(Message message) {
+    /**
+     * 将消息转换为Map, 用于存储到Redis中
+     *
+     * @param message 消息
+     * @return Map
+     */
+    static Map<String, String> toMap(Message message) {
 
-		Map<String, String> result = new HashMap<>(8);
-		result.put(FIELD_ID, message.getId());
-		result.put(FIELD_CREATE_TIME, Long.toString(message.getCreateTime()));
-		result.put(FIELD_MAX_RETRY_COUNT, Integer.toString(message.getMaxRetryCount()));
-		result.put(FIELD_LEFT_RETRY_COUNT, Integer.toString(message.getLeftRetryCount()));
-		result.put(FIELD_PAYLOAD, message.getBody());
+        Map<String, String> result = new HashMap<>(8);
+        result.put(FIELD_ID, message.getId());
+        result.put(FIELD_CREATE_TIME, Long.toString(message.getCreateTime()));
+        result.put(FIELD_MAX_RETRY_COUNT, Integer.toString(message.getMaxRetryCount()));
+        result.put(FIELD_LEFT_RETRY_COUNT, Integer.toString(message.getLeftRetryCount()));
+        result.put(FIELD_PAYLOAD, message.getBody());
 
-		if (null != message.getTtlSeconds()) {
-			result.put(FIELD_TTL, message.getTtlSeconds().toString());
-		}
+        if (null != message.getTtlSeconds()) {
+            result.put(FIELD_TTL, message.getTtlSeconds().toString());
+        }
 
-		return result;
-	}
+        return result;
+    }
 
 
-	/**
-	 * 将Map转换为消息
-	 *
-	 * @param data Map
-	 * @return 消息
-	 */
-	static Message toMessage(Map<String, String> data) {
-		if (null == data || data.isEmpty()) {
-			return null;
-		}
+    /**
+     * 将Map转换为消息
+     *
+     * @param data Map
+     * @return 消息
+     */
+    static Message toMessage(Map<String, String> data) {
+        if (null == data || data.isEmpty()) {
+            return null;
+        }
 
-		Message message = new Message();
-		message.setId(data.get(FIELD_ID));
-		message.setCreateTime(Long.parseLong(data.get(FIELD_CREATE_TIME)));
-		message.setLeftRetryCount(Integer.parseInt(data.get(FIELD_MAX_RETRY_COUNT)));
-		message.setBody(data.get(FIELD_PAYLOAD));
+        Message message = new Message();
+        message.setId(data.get(FIELD_ID));
+        message.setCreateTime(Long.parseLong(data.get(FIELD_CREATE_TIME)));
+        message.setLeftRetryCount(Integer.parseInt(data.get(FIELD_MAX_RETRY_COUNT)));
+        message.setBody(data.get(FIELD_PAYLOAD));
 
-		String retryCount = data.get(FIELD_MAX_RETRY_COUNT);
-		if (isNotBlank(retryCount)) {
-			message.setLeftRetryCount(Integer.parseInt(retryCount));
-		}
+        message.setOffset(Long.parseLong(data.get(FIELD_ID)));
+        message.setRetryCount(message.getMaxRetryCount() - message.getLeftRetryCount());
 
-		return message;
-	}
+        String retryCount = data.get(FIELD_MAX_RETRY_COUNT);
+        if (isNotBlank(retryCount)) {
+            message.setLeftRetryCount(Integer.parseInt(retryCount));
+        }
+
+        return message;
+    }
 
 }

@@ -44,8 +44,8 @@ public class RedisClientImpl implements RedisClient {
 	}
 
 	@Override
-	public String leftPop(String key, long timeoutSeconds) {
-		return redisTemplate.opsForList().leftPop(key, timeoutSeconds, TimeUnit.SECONDS);
+	public String leftPop(String key, long timeoutMillis) {
+		return redisTemplate.opsForList().leftPop(key, timeoutMillis, TimeUnit.MILLISECONDS);
 	}
 
 	@Override

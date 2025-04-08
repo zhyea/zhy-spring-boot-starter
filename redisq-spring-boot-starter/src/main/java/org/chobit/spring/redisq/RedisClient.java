@@ -57,7 +57,7 @@ public interface RedisClient {
 	 * @param timeoutSeconds 超时时间
 	 * @return 移除的元素
 	 */
-	String leftPop(String key, long timeoutSeconds);
+	String leftPop(String key, long timeoutMillis);
 
 
 	/**

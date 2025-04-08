@@ -19,17 +19,10 @@ public class DefaultQueueStrategy implements QueueStrategy {
 	private static final Logger logger = LoggerFactory.getLogger(DefaultQueueStrategy.class);
 
 
-	/**
-	 * 默认的dequeue超时时间
-	 */
-	private long dequeueTimeoutMillis = 1L;
-
-
 	private final Operator operator;
 
-	public DefaultQueueStrategy(Operator operator, long dequeueTimeoutMillis) {
+	public DefaultQueueStrategy(Operator operator) {
 		this.operator = operator;
-		this.dequeueTimeoutMillis = dequeueTimeoutMillis;
 	}
 
 
@@ -42,7 +35,7 @@ public class DefaultQueueStrategy implements QueueStrategy {
 
 	@Override
 	public Message dequeueNext(String queueName, String consumerId) {
-		String messageId = operator.dequeueMessageFromHead(queueName, consumerId, dequeueTimeoutMillis);
+		String messageId = operator.dequeueMessageFromHead(queueName, consumerId, 100L);
 		if (isNotBlank(messageId)) {
 			logger.debug("Dequeued message id [{}] from queue [{}({})]", messageId, queueName, consumerId);
 			return operator.loadMessage(queueName, messageId);
