@@ -11,82 +11,142 @@ import org.chobit.spring.redisq.beetle.constants.RetryStrategyEnum;
 public class ConsumeConfig {
 
 
-    /**
-     * 要消费的topic
-     */
-    private String topic;
+	/**
+	 * 要消费的topic
+	 */
+	private String topic;
 
-    /**
-     * 消费者ID
-     */
-    private String consumerId;
+	/**
+	 * 消费者ID
+	 */
+	private String consumerId;
 
-    /**
-     * 消费超时时间，单位毫秒
-     */
-    private Long consumeTimeout;
+	/**
+	 * 消费超时时间，单位毫秒
+	 */
+	private Long consumeTimeout;
 
-    /**
-     * 消费线程数
-     */
-    private Integer consumeThreads = 1;
+	/**
+	 * 消费线程数
+	 */
+	private Integer consumeThreads = 1;
 
-    /**
-     * 消费处理器ID
-     */
-    private String processor;
+	/**
+	 * 消费处理器ID
+	 */
+	private String processor;
 
-    /**
-     * 消费重试配置
-     */
-    private RetryStrategyEnum retry;
+	/**
+	 * 消费重试配置
+	 */
+	private RetryStrategyEnum retry;
 
 
-    public String getTopic() {
-        return topic;
-    }
+	/**
+	 * 获取topic
+	 *
+	 * @return topic
+	 */
+	public String getTopic() {
+		return topic;
+	}
 
-    public void setTopic(String topic) {
-        this.topic = topic;
-    }
+	/**
+	 * 设置topic
+	 *
+	 * @param topic topic
+	 */
+	public void setTopic(String topic) {
+		this.topic = topic;
+	}
 
-    public String getConsumerId() {
-        return consumerId;
-    }
+	/**
+	 * 获取消费者ID
+	 *
+	 * @return 消费者ID
+	 */
+	public String getConsumerId() {
+		return consumerId;
+	}
 
-    public void setConsumerId(String consumerId) {
-        this.consumerId = consumerId;
-    }
+	/**
+	 * 设置消费者ID
+	 *
+	 * @param consumerId 消费者ID
+	 */
+	public void setConsumerId(String consumerId) {
+		this.consumerId = consumerId;
+	}
 
-    public Long getConsumeTimeout() {
-        return consumeTimeout;
-    }
+	/**
+	 * 获取消费超时时间，单位毫秒
+	 *
+	 * @return 消费超时时间，单位毫秒
+	 */
+	public Long getConsumeTimeout() {
+		return consumeTimeout;
+	}
 
-    public void setConsumeTimeout(Long consumeTimeout) {
-        this.consumeTimeout = consumeTimeout;
-    }
+	/**
+	 * 设置消费超时时间，单位毫秒
+	 *
+	 * @param consumeTimeout 消费超时时间，单位毫秒
+	 */
+	public void setConsumeTimeout(Long consumeTimeout) {
+		this.consumeTimeout = consumeTimeout;
+	}
 
-    public Integer getConsumeThreads() {
-        return consumeThreads;
-    }
+	/**
+	 * 获取消费线程数
+	 *
+	 * @return 消费线程数
+	 */
+	public Integer getConsumeThreads() {
+		return consumeThreads;
+	}
 
-    public void setConsumeThreads(Integer consumeThreads) {
-        this.consumeThreads = consumeThreads;
-    }
+	/**
+	 * 设置消费线程数
+	 *
+	 * @param consumeThreads 消费线程数
+	 */
+	public void setConsumeThreads(Integer consumeThreads) {
+		this.consumeThreads = consumeThreads;
+	}
 
-    public String getProcessor() {
-        return processor;
-    }
+	/**
+	 * 获取消费处理器ID
+	 *
+	 * @return 消费处理器ID
+	 */
+	public String getProcessor() {
+		return processor;
+	}
 
-    public void setProcessor(String processor) {
-        this.processor = processor;
-    }
+	/**
+	 * 设置消费处理器ID
+	 *
+	 * @param processor 消费处理器ID
+	 */
+	public void setProcessor(String processor) {
+		this.processor = processor;
+	}
 
-    public RetryStrategyEnum getRetry() {
-        return retry;
-    }
+	/**
+	 * 获取消费重试配置
+	 *
+	 * @return 消费重试配置
+	 */
+	public RetryStrategyEnum getRetry() {
+		return retry;
+	}
 
-    public void setRetry(RetryStrategyEnum retry) {
-        this.retry = retry;
-    }
+	/**
+	 * 设置消费重试配置
+	 *
+	 * @param retry 消费重试配置
+	 */
+	public void setRetry(RetryStrategyEnum retry) {
+		this.retry = retry;
+	}
 }

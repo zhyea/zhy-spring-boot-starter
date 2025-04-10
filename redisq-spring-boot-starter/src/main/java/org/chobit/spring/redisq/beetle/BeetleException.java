@@ -9,11 +9,22 @@ package org.chobit.spring.redisq.beetle;
 public class BeetleException extends RuntimeException {
 
 
+	/**
+	 * 构造函数
+	 *
+	 * @param message 异常信息
+	 */
 	public BeetleException(String message) {
 		super(message);
 	}
 
 
+	/**
+	 * 构造函数
+	 *
+	 * @param message 异常信息
+	 * @param cause   异常
+	 */
 	public BeetleException(String message, Throwable cause) {
 		super(message, cause);
 	}
