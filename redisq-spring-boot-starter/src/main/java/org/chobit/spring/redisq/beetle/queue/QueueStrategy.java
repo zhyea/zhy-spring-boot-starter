@@ -26,6 +26,7 @@ public interface QueueStrategy {
 	 *
 	 * @param queueName  队列名称
 	 * @param consumerId 消费者名称
+	 * @return 消息
 	 */
 	Message dequeueNext(String queueName, String consumerId);
 

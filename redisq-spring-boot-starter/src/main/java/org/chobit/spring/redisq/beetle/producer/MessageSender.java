@@ -21,9 +21,17 @@ public class MessageSender implements Sender {
 	private final Integer maxRetryCount;
 
 
+	/**
+	 * 构造器
+	 *
+	 * @param queue         队列
+	 * @param serializer    序列化器
+	 * @param ttlSeconds    队列中消息的存活时间
+	 * @param maxRetryCount 消息最大重试次数
+	 */
 	public MessageSender(BeetleQueue queue,
 	                     Serializer serializer,
-						 Long ttlSeconds,
+	                     Long ttlSeconds,
 	                     Integer maxRetryCount) {
 		assert null != queue;
 		assert null != serializer;

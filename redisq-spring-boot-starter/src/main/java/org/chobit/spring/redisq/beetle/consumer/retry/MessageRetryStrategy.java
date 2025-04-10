@@ -12,6 +12,14 @@ import org.chobit.spring.redisq.beetle.Message;
 public interface MessageRetryStrategy {
 
 
+	/**
+	 * 消息重试
+	 *
+	 * @param message    消息
+	 * @param queue      队列
+	 * @param consumerId 消费者ID
+	 * @param t          异常
+	 */
 	void retry(Message message, BeetleQueue queue, String consumerId, Throwable t);
 
 }

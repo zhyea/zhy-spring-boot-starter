@@ -33,10 +33,20 @@ public class BeetleProperties {
 	private List<ProduceConfig> producer;
 
 
+	/**
+	 * 获取消息缓存时长
+	 *
+	 * @return 消息缓存时长
+	 */
 	public Long getTtlSeconds() {
 		return ttlSeconds;
 	}
 
+	/**
+	 * 设置消息缓存时长
+	 *
+	 * @param ttlSeconds 消息缓存时长
+	 */
 	public void setTtlSeconds(Long ttlSeconds) {
 		this.ttlSeconds = ttlSeconds;
 	}

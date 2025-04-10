@@ -9,8 +9,13 @@ package org.chobit.spring.redisq;
 public class RedisQConfigException extends RuntimeException {
 
 
-    public RedisQConfigException(String message) {
-        super(message);
-    }
+	/**
+	 * 构造函数
+	 *
+	 * @param message 异常信息
+	 */
+	public RedisQConfigException(String message) {
+		super(message);
+	}
 
 }

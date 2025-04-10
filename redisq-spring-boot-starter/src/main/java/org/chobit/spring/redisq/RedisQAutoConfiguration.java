@@ -24,21 +24,35 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 public class RedisQAutoConfiguration {
 
 
-    @DependsOn("redisqConnectionFactory")
-    @ConditionalOnBean(name = "redisqConnectionFactory")
-    @Bean
-    public RedisQContext redisqContext(@Qualifier("redisqConnectionFactory") RedisConnectionFactory connFactory,
-                                       BeetleProperties properties) throws Exception {
-        StringRedisTemplate redisTemplate = new StringRedisTemplate(connFactory);
-        return new RedisQContext(properties, redisTemplate);
-    }
+	/**
+	 * redisq 上下文
+	 *
+	 * @param connFactory connFactory
+	 * @param properties  properties
+	 * @return RedisQContext实例
+	 * @throws Exception 异常
+	 */
+	@DependsOn("redisqConnectionFactory")
+	@ConditionalOnBean(name = "redisqConnectionFactory")
+	@Bean
+	public RedisQContext redisqContext(@Qualifier("redisqConnectionFactory") RedisConnectionFactory connFactory,
+	                                   BeetleProperties properties) throws Exception {
+		StringRedisTemplate redisTemplate = new StringRedisTemplate(connFactory);
+		return new RedisQContext(properties, redisTemplate);
+	}
 
 
-    @Conditional(OnNonEmptyProducerCondition.class)
-    @Bean
-    public MessageProducer messageProducer(RedisQContext context) {
-        return context.getProducer();
-    }
+	/**
+	 * 消息生产者
+	 *
+	 * @param context redisq 上下文
+	 * @return MessageProducer实例
+	 */
+	@Conditional(OnNonEmptyProducerCondition.class)
+	@Bean
+	public MessageProducer messageProducer(RedisQContext context) {
+		return context.getProducer();
+	}
 
 
 }

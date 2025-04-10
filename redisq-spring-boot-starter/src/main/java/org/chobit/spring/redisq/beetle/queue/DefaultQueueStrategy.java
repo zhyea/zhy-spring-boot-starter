@@ -21,6 +21,12 @@ public class DefaultQueueStrategy implements QueueStrategy {
 
 	private final Operator operator;
 
+
+	/**
+	 * 构造器
+	 *
+	 * @param operator 消息队列操作者
+	 */
 	public DefaultQueueStrategy(Operator operator) {
 		this.operator = operator;
 	}

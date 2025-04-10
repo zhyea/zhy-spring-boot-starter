@@ -21,6 +21,11 @@ public class NoRetryStrategy implements MessageRetryStrategy {
 
 	private static final NoRetryStrategy instance = new NoRetryStrategy();
 
+	/**
+	 * 获取实例
+	 *
+	 * @return 实例
+	 */
 	public static NoRetryStrategy getInstance() {
 		return instance;
 	}

@@ -29,6 +29,7 @@ public interface BeetleQueue {
 	 * 消息出队
 	 *
 	 * @param consumerId 消费者ID
+	 * @return 消息
 	 */
 	Message dequeue(String consumerId);
 

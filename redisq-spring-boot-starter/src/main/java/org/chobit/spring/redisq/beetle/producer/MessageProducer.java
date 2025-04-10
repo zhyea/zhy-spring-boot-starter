@@ -15,11 +15,24 @@ public class MessageProducer {
 
 	private final Map<String, Sender> senders;
 
+	/**
+	 * 构造器
+	 *
+	 * @param senders 发送者
+	 */
 	public MessageProducer(Map<String, Sender> senders) {
 		this.senders = senders;
 	}
 
 
+	/**
+	 * 发送消息
+	 *
+	 * @param topic   主题
+	 * @param payload 消息体
+	 * @param <T>     消息体类型
+	 * @return 消息
+	 */
 	public <T> Message produce(String topic, T payload) {
 		Sender sender = senders.get(topic);
 		if (null == sender) {
@@ -29,6 +42,13 @@ public class MessageProducer {
 	}
 
 
+	/**
+	 * 发送消息
+	 *
+	 * @param topic    主题
+	 * @param payload  消息体
+	 * @param callback 回调
+	 */
 	public <T> void produce(String topic, T payload, ProduceCallback callback) {
 		Sender sender = senders.get(topic);
 		if (null == sender) {

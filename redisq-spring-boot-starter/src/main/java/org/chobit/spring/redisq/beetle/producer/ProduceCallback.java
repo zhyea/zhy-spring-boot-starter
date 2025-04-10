@@ -12,6 +12,12 @@ import org.chobit.spring.redisq.beetle.Message;
 public interface ProduceCallback {
 
 
+	/**
+	 * 消息生产完成回调
+	 *
+	 * @param message 消息
+	 * @param e       异常
+	 */
 	void onCompletion(Message message, Exception e);
 
 }

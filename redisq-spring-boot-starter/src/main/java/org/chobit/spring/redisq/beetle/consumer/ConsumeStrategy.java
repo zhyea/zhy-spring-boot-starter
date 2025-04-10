@@ -13,9 +13,18 @@ import java.util.concurrent.Callable;
 public interface ConsumeStrategy {
 
 
+	/**
+	 * 开始消费
+	 *
+	 * @param topic    消息topic
+	 * @param callback 消息回调
+	 */
 	void start(String topic, Callable<Message> callback);
 
 
+	/**
+	 * 停止消费
+	 */
 	void stop();
 
 }
