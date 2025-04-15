@@ -6,7 +6,7 @@
 redisq:
   consumer:
     - topic: topic1
-      consume-timeout: 1000
+      wait-timeout-millis: 1000
       consume-threads: 3
       retry: multi
       processor: zhyyy

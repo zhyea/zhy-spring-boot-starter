@@ -24,7 +24,7 @@ public class ConsumeConfig {
 	/**
 	 * 消费超时时间，单位毫秒
 	 */
-	private Long consumeTimeout;
+	private Long waitTimeoutMillis;
 
 	/**
 	 * 消费线程数
@@ -83,17 +83,17 @@ public class ConsumeConfig {
 	 *
 	 * @return 消费超时时间，单位毫秒
 	 */
-	public Long getConsumeTimeout() {
-		return consumeTimeout;
+	public Long getWaitTimeoutMillis() {
+		return waitTimeoutMillis;
 	}
 
 	/**
 	 * 设置消费超时时间，单位毫秒
 	 *
-	 * @param consumeTimeout 消费超时时间，单位毫秒
+	 * @param waitTimeoutMillis 消费超时时间，单位毫秒
 	 */
-	public void setConsumeTimeout(Long consumeTimeout) {
-		this.consumeTimeout = consumeTimeout;
+	public void setWaitTimeoutMillis(Long waitTimeoutMillis) {
+		this.waitTimeoutMillis = waitTimeoutMillis;
 	}
 
 	/**
