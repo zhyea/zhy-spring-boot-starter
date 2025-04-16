@@ -19,89 +19,93 @@ import static org.chobit.commons.utils.StrKit.isNotBlank;
 public class MessageConsumer {
 
 
-	private static final Logger logger = LoggerFactory.getLogger(MessageConsumer.class);
+    private static final Logger logger = LoggerFactory.getLogger(MessageConsumer.class);
 
 
-	private final String consumerId;
-	private final BeetleQueue queue;
-	private final ConsumeStrategy consumeStrategy;
-	private final MessageRetryStrategy retryStrategy;
+    private final String consumerId;
+    private final BeetleQueue queue;
+    private final ConsumeStrategy consumeStrategy;
+    private final MessageRetryStrategy retryStrategy;
 
-	private IProcessor processor;
-
-
-	/**
-	 * 构造器
-	 *
-	 * @param consumerId      消费者ID
-	 * @param queue           队列
-	 * @param consumeStrategy 消费策略
-	 * @param retryStrategy   重试策略
-	 */
-	public MessageConsumer(String consumerId,
-	                       BeetleQueue queue,
-	                       ConsumeStrategy consumeStrategy,
-	                       MessageRetryStrategy retryStrategy) {
-		this.consumerId = consumerId;
-		this.queue = queue;
-		this.consumeStrategy = consumeStrategy;
-		this.retryStrategy = retryStrategy;
-	}
+    private IProcessor processor;
 
 
-	/**
-	 * 启动消费者
-	 */
-	public void start() {
-		logger.info("Starting beetle consumer: {}", consumerId);
-
-		String topic = queue.topic();
-
-		assert isNotBlank(topic);
-
-		consumeStrategy.start(topic, () -> {
-			try {
-				return processNextMessage();
-			} catch (Exception e) {
-				logger.error("Error occurred while consuming message.", e);
-			}
-			return null;
-		});
-	}
+    /**
+     * 构造器
+     *
+     * @param consumerId      消费者ID
+     * @param queue           队列
+     * @param consumeStrategy 消费策略
+     * @param retryStrategy   重试策略
+     */
+    public MessageConsumer(String consumerId,
+                           BeetleQueue queue,
+                           ConsumeStrategy consumeStrategy,
+                           MessageRetryStrategy retryStrategy) {
+        this.consumerId = consumerId;
+        this.queue = queue;
+        this.consumeStrategy = consumeStrategy;
+        this.retryStrategy = retryStrategy;
+    }
 
 
-	private Message processNextMessage() {
-		Message message = null;
-		try {
-			message = queue.dequeue(consumerId);
-		} catch (Exception e) {
-			logger.error("Dequeue message for consumer [{}] failed.", consumerId, e);
-			throw e;
-		}
+    /**
+     * 启动消费者
+     */
+    public void start() {
+        logger.info("Starting beetle consumer: {}", consumerId);
 
-		try {
-			processor.process(message);
-		} catch (Throwable e) {
-			logger.error("Error occurred while processing message [{}]", message, e);
-			retryStrategy.retry(message, queue, consumerId, e);
-		}
+        String topic = queue.topic();
 
-		return message;
-	}
+        assert isNotBlank(topic);
 
-
-	/**
-	 * 停止消费者
-	 */
-	@PreDestroy
-	public void stop() {
-		logger.info("Stopping beetle consumer: {}", consumerId);
-		consumeStrategy.stop();
-		logger.info("Beetle consumer [{}] has been stopped.", consumerId);
-	}
+        consumeStrategy.start(topic, () -> {
+            try {
+                return processNextMessage();
+            } catch (Exception e) {
+                logger.error("Error occurred while consuming message.", e);
+            }
+            return null;
+        });
+    }
 
 
-	public void setProcessor(IProcessor processor) {
-		this.processor = processor;
-	}
+    private Message processNextMessage() {
+        Message message = null;
+        try {
+            message = queue.dequeue(consumerId);
+        } catch (Exception e) {
+            logger.error("Dequeue message for consumer [{}] failed.", consumerId, e);
+            throw e;
+        }
+
+        if (null == message) {
+            return null;
+        }
+
+        try {
+            processor.process(message);
+        } catch (Throwable e) {
+            logger.error("Error occurred while processing message [{}]", message, e);
+            retryStrategy.retry(message, queue, consumerId, e);
+        }
+
+        return message;
+    }
+
+
+    /**
+     * 停止消费者
+     */
+    @PreDestroy
+    public void stop() {
+        logger.info("Stopping beetle consumer: {}", consumerId);
+        consumeStrategy.stop();
+        logger.info("Beetle consumer [{}] has been stopped.", consumerId);
+    }
+
+
+    public void setProcessor(IProcessor processor) {
+        this.processor = processor;
+    }
 }

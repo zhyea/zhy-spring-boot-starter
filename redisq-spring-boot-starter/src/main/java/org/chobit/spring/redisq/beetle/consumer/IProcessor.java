@@ -11,11 +11,12 @@ import org.chobit.spring.redisq.beetle.Message;
 public interface IProcessor {
 
 
-	/**
-	 * 消息处理
-	 *
-	 * @param message 消息
-	 */
-	void process(Message message);
+    /**
+     * 消息处理
+     *
+     * @param message 消息
+     * @throws Exception 处理期间出现的异常
+     */
+    void process(Message message) throws Exception;
 
 }
