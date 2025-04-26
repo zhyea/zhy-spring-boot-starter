@@ -8,12 +8,14 @@ import org.springframework.context.annotation.Role;
 @ConfigurationProperties(prefix = "trace")
 public class TraceClewProperties {
 
+
 	private String flag;
 
 
 	public String getFlag() {
 		return flag;
 	}
+
 
 	public void setFlag(String flag) {
 		this.flag = flag;

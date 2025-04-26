@@ -18,11 +18,11 @@ import java.lang.annotation.*;
 public @interface Tags {
 
 
-    /**
-     * 标签信息
-     *
-     * @return 标签集合
-     */
-    String[] value() default {};
+	/**
+	 * 标签信息
+	 *
+	 * @return 标签集合
+	 */
+	String[] value() default {};
 
 }

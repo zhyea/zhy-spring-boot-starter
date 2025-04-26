@@ -23,7 +23,7 @@ import static org.chobit.commons.utils.StrKit.join;
 
 
 /**
- * 接口异常处理
+ * API返回值处理
  *
  * @author robin
  */
@@ -31,66 +31,65 @@ import static org.chobit.commons.utils.StrKit.join;
 public class ResponseWrapperAdvice implements ResponseBodyAdvice<Object> {
 
 
-    private static final Logger logger = LoggerFactory.getLogger(ResponseWrapperAdvice.class);
+	private static final Logger logger = LoggerFactory.getLogger(ResponseWrapperAdvice.class);
 
-    private final RwProperties rwProperties;
-
-
-    @Autowired
-    public ResponseWrapperAdvice(RwProperties rwProperties) {
-        this.rwProperties = rwProperties;
-        logger.debug("ApiResponseWrapper has been enabled.");
-    }
+	private final RwProperties rwProperties;
 
 
-    @Override
-    public boolean supports(MethodParameter returnType,
-                            Class<? extends HttpMessageConverter<?>> converterType) {
-        boolean isApiController = AnnotatedElementUtils.hasAnnotation(returnType.getContainingClass(), RestController.class)
-                || returnType.hasMethodAnnotation(ResponseBody.class);
-        ;
-
-        boolean effectiveResponseWrapper = AnnotatedElementUtils.hasAnnotation(returnType.getContainingClass(), ResponseWrapper.class)
-                || returnType.hasMethodAnnotation(ResponseWrapper.class);
-
-        effectiveResponseWrapper = rwProperties.isSilentMode() || effectiveResponseWrapper;
-
-        return isApiController && effectiveResponseWrapper;
-    }
+	@Autowired
+	public ResponseWrapperAdvice(RwProperties rwProperties) {
+		this.rwProperties = rwProperties;
+		logger.debug("ApiResponseWrapper has been enabled.");
+	}
 
 
-    @Override
-    public Object beforeBodyWrite(@Nullable Object body,
-                                  MethodParameter returnType,
-                                  MediaType selectedContentType,
-                                  Class<? extends HttpMessageConverter<?>> selectedConverterType,
-                                  ServerHttpRequest request,
-                                  ServerHttpResponse response) {
-        if (body instanceof Result) {
-            return body;
-        }
-        if (selectedConverterType.equals(StringHttpMessageConverter.class)) {
-            Result<?> result = new Result<>(rwProperties.getSuccessCode(), body);
-            this.setTag(returnType, result);
-            return JsonKit.toJson(result);
-        }
+	@Override
+	public boolean supports(MethodParameter returnType,
+	                        Class<? extends HttpMessageConverter<?>> converterType) {
+		boolean isApiController = AnnotatedElementUtils.hasAnnotation(returnType.getContainingClass(), RestController.class)
+				|| returnType.hasMethodAnnotation(ResponseBody.class);
 
-        Result<?> result = new Result<>(body);
-        this.setTag(returnType, result);
+		boolean effectiveResponseWrapper = AnnotatedElementUtils.hasAnnotation(returnType.getContainingClass(), ResponseWrapper.class)
+				|| returnType.hasMethodAnnotation(ResponseWrapper.class);
 
-        return result;
-    }
+		effectiveResponseWrapper = rwProperties.isSilentMode() || effectiveResponseWrapper;
+
+		return isApiController && effectiveResponseWrapper;
+	}
 
 
-    /**
-     * 设置返回结果中的标签
-     */
-    private void setTag(MethodParameter returnType, Result<?> result) {
-        Tags tags = returnType.getMethodAnnotation(Tags.class);
-        if (null != tags && null != tags.value() && tags.value().length > 0) {
-            result.setTags(join(tags.value()));
-        } else if (Collections2.isNotEmpty(rwProperties.getTags())) {
-            result.setTags(join(rwProperties.getTags()));
-        }
-    }
+	@Override
+	public Object beforeBodyWrite(@Nullable Object body,
+	                              MethodParameter returnType,
+	                              MediaType selectedContentType,
+	                              Class<? extends HttpMessageConverter<?>> selectedConverterType,
+	                              ServerHttpRequest request,
+	                              ServerHttpResponse response) {
+		if (body instanceof Result) {
+			return body;
+		}
+		if (selectedConverterType.equals(StringHttpMessageConverter.class)) {
+			Result<?> result = new Result<>(rwProperties.getSuccessCode(), body);
+			this.setTag(returnType, result);
+			return JsonKit.toJson(result);
+		}
+
+		Result<?> result = new Result<>(body);
+		this.setTag(returnType, result);
+
+		return result;
+	}
+
+
+	/**
+	 * 设置返回结果中的标签
+	 */
+	private void setTag(MethodParameter returnType, Result<?> result) {
+		Tags tags = returnType.getMethodAnnotation(Tags.class);
+		if (null != tags && null != tags.value() && tags.value().length > 0) {
+			result.setTags(join(tags.value()));
+		} else if (Collections2.isNotEmpty(rwProperties.getTags())) {
+			result.setTags(join(rwProperties.getTags()));
+		}
+	}
 }

@@ -25,18 +25,18 @@ public class RwAutoConfiguration {
 
 
 
+	@ConditionalOnMissingBean(ResponseBodyAdvice.class)
 	@Bean
 	public ResponseWrapperAdvice responseWrapperAdvice(RwProperties rwProperties) {
 		return new ResponseWrapperAdvice(rwProperties);
 	}
 
 
-	@ConditionalOnProperty(name = "rw.wrapExcept", matchIfMissing = true)
+	@ConditionalOnProperty(name = "rw.wrapExcept")
 	@ConditionalOnMissingBean(ApiExceptionAdvisor.class)
 	@Bean
-	public ApiExceptionAdvisor apiExceptionAdvisor(RwProperties rwProperties){
+	public ApiExceptionAdvisor apiExceptionAdvisor(RwProperties rwProperties) {
 		return new ApiExceptionAdvisor(rwProperties);
 	}
-
 
 }

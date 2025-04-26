@@ -24,7 +24,7 @@ import static org.chobit.commons.utils.StrKit.join;
 
 
 /**
- * Api返回值包装切面定义
+ * Api异常包装切面定义
  *
  * @author robin
  */
@@ -143,9 +143,8 @@ public class ApiExceptionAdvisor {
 	}
 
 
-
-	private void wrapTags(Result<?> result){
-		if(Collections2.isNotEmpty(rwProperties.getTags())){
+	private void wrapTags(Result<?> result) {
+		if (Collections2.isNotEmpty(rwProperties.getTags())) {
 			result.setTags(join(rwProperties.getTags()));
 		}
 	}
